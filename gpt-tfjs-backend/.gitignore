@@ -1,0 +1,5 @@
+bun.lockb
+losses-*.json
+node_modules/
+models/*
+datasets/*
