@@ -3,7 +3,6 @@
   "dependencies": {
     "@tensorflow/tfjs-node": "^4.11.0",
     "@tensorflow/tfjs-node-gpu": "4.4.0",
-    "ervy": "^1.0.7",
     "express": "^4.18.2",
     "express-ip": "^1.0.4",
     "gpt-tfjs": "^0.0.5",

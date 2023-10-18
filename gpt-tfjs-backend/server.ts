@@ -1,8 +1,7 @@
-const { readFile } = require('fs/promises')
-const express = require('express');
-const bodyParser = require('body-parser');
-const expressip = require('express-ip');
-const { getDataset } = require('./dataset');
+import { readFile } from 'fs/promises';
+import express from 'express';
+import bodyParser from 'body-parser';
+import expressip from 'express-ip';
 const app = express();
 
 app.use(bodyParser.json());
@@ -26,9 +25,7 @@ app.use((req, res, next) => {
 
 
 app.use('/api', async (req, res) => {  
-  const dataset = await getDataset('./openwebtext')
-  console.log(dataset);
-  const benchmark = await readFile('./benchmark/losses-3-dummy.json') 
+  const benchmark = await readFile('./benchmark/losses-3-dummy.json', { encoding: 'utf-8' }) 
   res.json(JSON.parse(benchmark))
 });
 

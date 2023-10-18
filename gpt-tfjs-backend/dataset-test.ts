@@ -1,4 +1,4 @@
-import tf from '@tensorflow/tfjs-node'
+import * as tf from '@tensorflow/tfjs-node'
 import getDataset, { inference } from './dataset.js'
 import { DatasetSample } from './types.js';
 import { model }  from 'gpt-tfjs'

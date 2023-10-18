@@ -1,5 +1,5 @@
 import { writeFile }  from 'fs/promises';
-import * as tf from "@tensorflow/tfjs"; 
+import * as tf from "@tensorflow/tfjs-node"; 
 import { model }  from 'gpt-tfjs'
 import { createDataset } from './sort.js';
 import getDataset from './dataset.js';
