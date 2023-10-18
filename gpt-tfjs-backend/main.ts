@@ -3,6 +3,7 @@ import tf from "@tensorflow/tfjs";
 import { model }  from 'gpt-tfjs'
 import { createDataset } from './sort';
 import getDataset from './dataset';
+import { Dataset } from './types';
 const { GPTLMHeadModel } = model
 
 type Datapoint = {
@@ -28,7 +29,7 @@ const callback = (stats: Datasample[], model: any, start: number) => (_: any, lo
 	stats[iter - 1].mem[model] = tf.memory().numBytes
 }
 
-async function runModels<T extends tf.TensorContainer>(dataset: tf.data.Dataset<T>, defaultConfig: any) {
+async function runModels(dataset: Dataset, defaultConfig: any) {
 	const stats = []
 	const date = new Date().toISOString()
 
@@ -51,6 +52,6 @@ async function runModels<T extends tf.TensorContainer>(dataset: tf.data.Dataset<
 
 
 // const { dataset, defaultConfig } = createDataset() as any;
-const dataset = await getDataset('openwebtext') as any
-const defaultConfig = {}
+const dataset = await getDataset('openwebtext')
+const defaultConfig = { batchSize: 1 }
 await runModels(dataset, defaultConfig)

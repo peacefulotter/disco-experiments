@@ -8,5 +8,9 @@
     "express-ip": "^1.0.4",
     "gpt-tfjs": "^0.0.5",
     "gpt-tokenizer": "^2.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.6",
+    "ts-node": "^10.9.1"
   }
 }
