@@ -1,36 +1,25 @@
 import { writeFile }  from 'fs/promises';
-import tf from "@tensorflow/tfjs"; 
+import * as tf from "@tensorflow/tfjs"; 
 import { model }  from 'gpt-tfjs'
-import { createDataset } from './sort';
-import getDataset from './dataset';
-import { Dataset } from './types';
+import { createDataset } from './sort.js';
+import getDataset from './dataset.js';
+import { BenchmarkSample, Dataset, DatasetConfig, Benchmark, configs } from './types.js';
 const { GPTLMHeadModel } = model
 
-type Datapoint = {
-  'gpt-nano': number, 
-  'gpt-micro': number, 
-  'gpt-mini': number
+
+const callback = (samples: BenchmarkSample[], model: any, start: number) => (_: any, loss: number, iter: number) => {
+	if (iter >= samples.length)
+		samples.push({ iter: iter - 1, loss: {}, time: {}, mem: {} })
+	samples[iter - 1].loss[model] = loss
+	samples[iter - 1].time[model] = Date.now() - start
+	samples[iter - 1].mem[model] = tf.memory().numBytes
 }
 
-interface Datasample {
-  iter: number,
-  loss: Partial<Datapoint>,
-  time: Partial<Datapoint>,
-  mem: Partial<Datapoint>
-} 
-
-const configs = ['gpt-nano', 'gpt-micro', 'gpt-mini'] //, 'gpt2', 'gpt2-medium', 'gpt2-large', 'gpt2-xl']
-
-const callback = (stats: Datasample[], model: any, start: number) => (_: any, loss: number, iter: number) => {
-	if (iter >= stats.length)
-		stats.push({ iter: iter - 1, loss: {}, time: {}, mem: {} })
-	stats[iter - 1].loss[model] = loss
-	stats[iter - 1].time[model] = Date.now() - start
-	stats[iter - 1].mem[model] = tf.memory().numBytes
-}
-
-async function runModels(dataset: Dataset, defaultConfig: any) {
-	const stats = []
+async function runModels(dataset: Dataset, defaultConfig: Record<string, any>) {
+	const benchmark: Benchmark = {
+		samples: [],
+		performance: {}
+	}
 	const date = new Date().toISOString()
 
 	for (const modelType of configs) 
@@ -40,18 +29,26 @@ async function runModels(dataset: Dataset, defaultConfig: any) {
 		const config = { ...defaultConfig, modelType }
 		const gpt = GPTLMHeadModel(config)
 		
-		const cb = callback(stats, modelType, Date.now())
+		const start = Date.now()
+		const cb = callback(benchmark.samples, modelType, start)
 		await gpt.train(dataset, {epochs: 15, verbose: true, callbacks: [cb]})
-		
+		const end = Date.now()
+		const performance = (end - start)/ dataset.size
+		benchmark.performance[modelType] = performance
+
 		const path = 'models/' + date + '-' + modelType
 		await gpt.save(path)
 	}
 
-	await writeFile('losses-3-dummy.json', JSON.stringify(stats, null, 2), 'utf8');
+	await writeFile(`./benchmarks/benchmark-${date}.json`, JSON.stringify(benchmark, null, 2), 'utf8');
 }
 
 
-// const { dataset, defaultConfig } = createDataset() as any;
-const dataset = await getDataset('openwebtext')
-const defaultConfig = { batchSize: 1 }
-await runModels(dataset, defaultConfig)
+const { dataset, defaultConfig: config } = createDataset() as any;
+// const config: DatasetConfig & Record<string, any> = { 
+// 	vocabSize: 1024, 
+// 	blockSize: 16, 
+// 	batchSize: 1 
+// }
+// const dataset = await getDataset('openwebtext', config)
+await runModels(dataset, config)

@@ -1,7 +1,8 @@
 import tf from '@tensorflow/tfjs-node'
-import getDataset, { PreprocessedData } from './dataset'
-import { DatasetSample } from './types';
+import getDataset, { inference } from './dataset.js'
+import { DatasetSample } from './types.js';
 import { model }  from 'gpt-tfjs'
+import { createDataset } from './sort.js';
 const { GPTLMHeadModel } = model
 
 interface DolphinFeature {
@@ -29,23 +30,33 @@ interface DolphinFile {
 }
 
 async function test() {
-    const ds = await getDataset('dolphin', (file: string) => {
-        const { rows } = JSON.parse(file) as DolphinFile
-        return rows.reduce( (acc, { row }) => {
-            acc.xs.push(row.instruction + row.input)
-            acc.ys.push(row.output)
-            return acc
-        }, {xs: [], ys: []} as PreprocessedData )
-    })
+    // , (file: string) => {
+    //     const { rows } = JSON.parse(file) as DolphinFile
+    //     return rows.reduce( (acc, { row }) => {
+    //         acc.xs.push(row.instruction + row.input)
+    //         acc.ys.push(row.output)
+    //         return acc
+    //     }, {xs: [], ys: []} as PreprocessedData )
+    // }
+    const config = { modelType: 'gpt-nano', vocabSize: 2048, blockSize: 16, debug: true }
+    const test = await createDataset()
+    const iter = await test.dataset.iterator()
+    const { value }= await iter.next()
+    // console.log(await value.x.array());
+        
+    const ds = await getDataset('dolphin', config)
 
     console.log(ds);
-    await ds.forEachAsync((a) => {
-        console.log(typeof a + " => " + Object.keys(a) + ' -> ' + Object.values(a))
-    })
+    // await ds.forEachAsync((a) => {
+    //     console.log(typeof a + " => " + Object.keys(a) + ' -> ' + Object.values(a))
+    // })
 
-    const config = { modelType: 'gpt-nano', vocabSize: 50257, blockSize: 1024, debug: true }
     const gpt = GPTLMHeadModel(config)
     await gpt.train(ds, {epochs: 1, verbose: true})
+
+    const response = await inference(gpt, 'What is life?')
+    console.log('response', response);
+    
 }
 
 await test()

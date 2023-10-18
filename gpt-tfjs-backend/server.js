@@ -28,8 +28,8 @@ app.use((req, res, next) => {
 app.use('/api', async (req, res) => {  
   const dataset = await getDataset('./openwebtext')
   console.log(dataset);
-  const losses = await readFile('./losses-3-dummy.json') 
-  res.json(JSON.parse(losses))
+  const benchmark = await readFile('./benchmark/losses-3-dummy.json') 
+  res.json(JSON.parse(benchmark))
 });
 
 const server = app.listen(process.env.PORT || 5000, () => {

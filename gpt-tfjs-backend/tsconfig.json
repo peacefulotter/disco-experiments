@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "esModuleInterop": true,
+        "moduleResolution": "nodenext",
+        "module": "nodenext",
+        "target": "esnext",
+        "outDir": "./dist",
+        "strict": false, // can't set strict because of gpt-tfjs that has no declarations
+        "allowJs": true,
+        "declaration": true,
+        "emitDeclarationOnly": false,
+        "skipLibCheck": true
+    },
+    "include": [
+        "./**/*.ts",
+        "./**/*.js",
+    ],
+    "exclude": [
+        "./node_modules/**/*",
+        "./dist/**/*"
+    ]
+}

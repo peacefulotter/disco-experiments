@@ -1,6 +1,6 @@
 // Saving a modle with JEST throws Unsupported TypedArray subtype: Float32Array
 // https://stackoverflow.com/questions/57452981/tensorflowjs-save-model-throws-error-unsupported-typedarray-subtype-float32arr
-const tf = require('@tensorflow/tfjs-node')
+import tf from '@tensorflow/tfjs-node'
 
 function createDataset(split='train', length=6, num_digits=3) {
     const vocabSize = num_digits
@@ -46,11 +46,11 @@ function createDataset(split='train', length=6, num_digits=3) {
     return { 
         dataset, 
         defaultConfig: {
-            vocabSize: 3,
+            vocabSize: vocabSize,
             blockSize: 11,
             dropout: 0.1
         } 
     }
 }
 
-module.exports = { createDataset }
+export { createDataset }
