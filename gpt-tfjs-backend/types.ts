@@ -1,8 +1,8 @@
 import * as tf from "@tensorflow/tfjs-node";
 
-export const configs = ["gpt-nano", "gpt-micro", "gpt-mini"] as const; //, 'gpt2', 'gpt2-medium', 'gpt2-large', 'gpt2-xl']
+export const models = ["gpt-nano", "gpt-micro", "gpt-mini"] as const; //, 'gpt2', 'gpt2-medium', 'gpt2-large', 'gpt2-xl']
 
-type ModelDataPoint = Record<(typeof configs)[number], number>;
+type ModelDataPoint = Record<(typeof models)[number], number>;
 
 export type TrainingSample = {
   loss: number;
@@ -80,4 +80,30 @@ export interface TrainConfig {
   callbacks?: Callback[];
 }
 
-export type Config = DatasetConfig & ModelConfig & TrainConfig;
+export interface WandbConfig {
+  wandbProject: string;
+  wandbName: string;
+}
+
+export type Config = DatasetConfig & ModelConfig & TrainConfig & WandbConfig;
+
+export interface JSONConfig {
+  model: string;
+  n_head: number;
+  n_layer: number;
+  n_embd: number;
+  dataset: string;
+  batch_size: number;
+  seq_length: number;
+  lr: number;
+  max_iters: number;
+  weight_decay: number;
+  optimizer: string;
+  grad_clip: number;
+  scheduler: string | null;
+  dropout: number;
+  num_workers: number;
+  vocab_size: number;
+  wandb_project: string;
+  wandb_name: string;
+}

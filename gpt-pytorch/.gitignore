@@ -1,4 +1,4 @@
-minGPT/
-llm-baselines/
+__pycache__/
+datasets/
 *.pt
 *.pth

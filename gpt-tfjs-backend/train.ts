@@ -1,38 +1,12 @@
 import wandb from "@wandb/sdk";
 import { model } from "gpt-tfjs";
 import { getEncodedDataset } from "./dataset.js";
-import { EncodedDataset, Config } from "./types.js";
+import { EncodedDataset } from "./types.js";
+import { config, datasetName } from "./config.js";
 const { GPTLMHeadModel } = model;
 
-const getName = (args: Config, prefix: string) => {
-  return `${prefix}_js_${args.modelType}_lr${args.lr}_bs${args.batchSize}x1_1nodes`;
-};
-
-const defaultConfig: Config = {
-  debug: false,
-
-  vocabSize: 50257,
-  chunkSize: 1024,
-  blockSize: 32,
-  verbose: false,
-
-  epochs: 1,
-  maxIter: 3600,
-  batchSize: 16,
-  lr: 0.0002,
-  weightDecay: 1e-3,
-};
-
-// const dataset = await getDataset('openwebtext', config)
-
-export default async function main(
-  tf: any,
-  prefix: string,
-  datasetName: string,
-  modelType: string
-) {
+export default async function main(tf: any, prefix: string) {
   const date = new Date().toISOString();
-  const config = { ...defaultConfig, modelType };
   const dataset: EncodedDataset = await getEncodedDataset(
     tf,
     datasetName,
@@ -40,22 +14,23 @@ export default async function main(
   );
 
   await wandb.init({
-    project: "my-project",
-    name: getName(config, prefix),
+    project: config.wandbProject,
+    name: `${prefix}_${config.wandbName}`,
     config: { ...config, date },
   });
 
-  console.log("Running", modelType);
+  console.log("Running", config.modelType);
   const gpt = GPTLMHeadModel(config);
 
-  let time = Date.now();
+  const start = Date.now();
+  let time = start;
   const cb = async (_: any, loss: number, iter: number) => {
     wandb.log({
       "train/loss": loss,
       iter,
       mem: tf.memory().numBytes,
       dt_ms: Date.now() - time,
-      time: Date.now(),
+      time: Date.now() - start,
     });
     time = Date.now();
   };

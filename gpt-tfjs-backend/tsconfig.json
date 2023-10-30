@@ -9,7 +9,8 @@
         "allowJs": true,
         "declaration": true,
         "emitDeclarationOnly": false,
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "resolveJsonModule": true
     },
     "include": [
         "./**/*.ts",
