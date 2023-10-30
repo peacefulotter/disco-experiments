@@ -3,11 +3,13 @@
   "dependencies": {
     "@tensorflow/tfjs-node": "4.4.0",
     "@tensorflow/tfjs-node-gpu": "4.4.0",
+    "@wandb/sdk": "^0.5.1",
     "express": "^4.18.2",
     "express-ip": "^1.0.4",
     "filestream": "^5.0.0",
     "gpt-tfjs": "^0.0.5",
-    "gpt-tokenizer": "^2.1.2"
+    "gpt-tokenizer": "^2.1.2",
+    "wandb": "^0.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.8.6",

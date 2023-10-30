@@ -63,3 +63,21 @@ export interface ModelConfig {
   nEmbd?: number;
   dropout?: number;
 }
+
+type Callback = (
+  model: any,
+  loss: number,
+  iter: number
+) => Promise<void> | void;
+
+export interface TrainConfig {
+  epochs?: number;
+  maxIter?: number;
+  batchSize?: number;
+  shuffle?: boolean;
+  lr?: number;
+  weightDecay?: boolean | number;
+  callbacks?: Callback[];
+}
+
+export type Config = DatasetConfig & ModelConfig & TrainConfig;

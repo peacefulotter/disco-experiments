@@ -1,82 +1,62 @@
-import { writeFile } from "fs/promises";
+import wandb from "@wandb/sdk";
 import * as tf from "@tensorflow/tfjs-node";
 import { model } from "gpt-tfjs";
 import { getEncodedDataset } from "./dataset.js";
-import {
-  EncodedDataset,
-  DatasetConfig,
-  configs,
-  ModelConfig,
-  TrainingSample,
-} from "./types.js";
+import { EncodedDataset, Config } from "./types.js";
 const { GPTLMHeadModel } = model;
 
-function pad(num: number, size: number) {
-  let n = num.toString();
-  while (n.length < size) n = "0" + n;
-  return n;
-}
+const getName = (args: Config) => {
+  return `js_${args.modelType}_lr${args.lr}_bs${args.batchSize}x1_1nodes`;
+};
 
-const callback =
-  (samples: TrainingSample[], start: number, date: string, modelType: any) =>
-  async (model: any, loss: number, iter: number) => {
-    samples.push({ loss, time: Date.now() - start, mem: tf.memory().numBytes });
-    if (iter % 5000 === 0) {
-      const path = `file://./models/${date}-${modelType}-${iter}`;
-      console.log("Saving to", path);
-      await model.save(path);
-    }
-  };
-
-async function runModels(
-  dataset: EncodedDataset,
-  defaultConfig: DatasetConfig & ModelConfig
+async function runModel(
+  datasetName: string,
+  modelType: string,
+  defaultConfig: Config
 ) {
   const date = new Date().toISOString();
+  const config = { ...defaultConfig, modelType };
+  const dataset: EncodedDataset = await getEncodedDataset(datasetName, config);
 
-  for (const modelType of configs) {
-    console.log("Running", modelType);
+  await wandb.init({
+    project: "my-project",
+    name: getName(config),
+    config: { ...config, date },
+  });
 
-    const config = { ...defaultConfig, modelType };
-    const gpt = GPTLMHeadModel(config);
+  console.log("Running", modelType);
+  const gpt = GPTLMHeadModel(config);
 
-    const start = Date.now();
-    const samples: TrainingSample[] = [];
-    const cb = callback(samples, start, date, modelType);
-    await gpt.train(dataset, {
-      epochs: 1,
-      verbose: true,
-      callbacks: [cb],
+  let time = Date.now();
+  const cb = async (_: any, loss: number, iter: number) => {
+    wandb.log({
+      "train/loss": loss,
+      iter,
+      mem: tf.memory().numBytes,
+      dt_ms: Date.now() - time,
+      time: Date.now(),
     });
-    const end = Date.now();
-    const performance = (end - start) / dataset.size;
+    time = Date.now();
+  };
+  await gpt.train(dataset, { ...config, callbacks: [cb] });
 
-    // const path = "models/" + date + "-" + modelType;
-    // await gpt.save(path);
-
-    const benchmark = { samples, performance };
-    await writeFile(
-      `./benchmarks/benchmark-${date}-${modelType}.json`,
-      JSON.stringify(benchmark, null, 2),
-      "utf8"
-    );
-  }
+  await wandb.finish();
 }
 
-const config: DatasetConfig & ModelConfig = {
+const config: Config = {
   debug: false,
 
   vocabSize: 50257,
   chunkSize: 1024,
   blockSize: 32,
   verbose: false,
+
+  epochs: 1,
+  maxIter: 3600,
+  batchSize: 16,
+  lr: 0.0002,
+  weightDecay: 1e-3,
 };
 
-const dataset = await getEncodedDataset("wikitext-103/train", config);
-// const config: DatasetConfig & Record<string, any> = {
-// 	vocabSize: 1024,
-// 	blockSize: 16,
-// 	batchSize: 1
-// }
 // const dataset = await getDataset('openwebtext', config)
-await runModels(dataset, config);
+await runModel("wikitext-103/train", "gpt-nano", config);
