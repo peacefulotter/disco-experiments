@@ -1,7 +1,7 @@
 bun.lockb
 node_modules/
-models/*
-datasets/*
-benchmarks/*
+models/**/*
+datasets/**/*
+benchmarks/**/*
 test.ts
 dist/

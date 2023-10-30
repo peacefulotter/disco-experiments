@@ -33,7 +33,11 @@ export default async function main(
 ) {
   const date = new Date().toISOString();
   const config = { ...defaultConfig, modelType };
-  const dataset: EncodedDataset = await getEncodedDataset(datasetName, config);
+  const dataset: EncodedDataset = await getEncodedDataset(
+    tf,
+    datasetName,
+    config
+  );
 
   await wandb.init({
     project: "my-project",

@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import * as tf from "@tensorflow/tfjs-node";
 import { readdir } from "fs/promises";
 // import { decode, encode } from "gpt-tokenizer";
 import { decode, encode } from "gpt-tokenizer/esm/model/text-davinci-003";
@@ -24,6 +23,7 @@ async function sleep(t: number): Promise<void> {
 }
 
 function createDatasetFromTextStreams(
+  tf: any,
   getStreams: () => fs.ReadStream[],
   config: DatasetConfig
 ) {
@@ -46,6 +46,7 @@ function createDatasetFromTextStreams(
 }
 
 function createEncodedDatasetFromTextStreams(
+  tf: any,
   getStreams: () => fs.ReadStream[],
   config: DatasetConfig
 ) {
@@ -97,14 +98,18 @@ async function createDataset(dir: string) {
   return getStreams;
 }
 
-export async function getEncodedDataset(dir: string, config: DatasetConfig) {
+export async function getEncodedDataset(
+  tf: any,
+  dir: string,
+  config: DatasetConfig
+) {
   const getStreams = await createDataset(dir);
-  return createEncodedDatasetFromTextStreams(getStreams, config);
+  return createEncodedDatasetFromTextStreams(tf, getStreams, config);
 }
 
-export async function getDataset(dir: string, config: DatasetConfig) {
+export async function getDataset(tf: any, dir: string, config: DatasetConfig) {
   const getStreams = await createDataset(dir);
-  return createDatasetFromTextStreams(getStreams, config);
+  return createDatasetFromTextStreams(tf, getStreams, config);
 }
 
 export async function inference(model: typeof GPTLMHeadModel, text: string) {

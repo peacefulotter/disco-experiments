@@ -1,9 +1,7 @@
 import * as tf from "@tensorflow/tfjs-node";
-import getDataset, { inference } from "./dataset.js";
-import { DatasetConfig, DatasetSample, ModelConfig } from "./types.js";
+import { getDataset, getEncodedDataset, inference } from "./dataset.js";
+import { DatasetConfig, ModelConfig } from "./types.js";
 import { model } from "gpt-tfjs";
-import { createDataset } from "./sort.js";
-import { log } from "util";
 const { GPTLMHeadModel } = model;
 
 interface DolphinFeature {
@@ -49,15 +47,24 @@ async function test() {
     verbose: false,
   };
 
-  const ds = await getDataset("wikitext-103/train", config);
+  const ds = await getDataset(tf, "wikitext-103/train", config);
   console.log(ds);
+  const iter = await ds.iterator();
+  const next = await iter.next();
+  console.log(next);
+
+  const ds_encoded = await getEncodedDataset(tf, "wikitext-103/train", config);
+  console.log(ds_encoded);
+  const iter_encoded = await ds_encoded.iterator();
+  const next_encoded = await iter_encoded.next();
+  console.log(next_encoded);
 
   // await ds.forEachAsync((a) => {
   //     console.log(typeof a + " => " + Object.keys(a) + ' -> ' + Object.values(a))
   // })
 
   const gpt = GPTLMHeadModel(config);
-  await gpt.train(ds, { epochs: 1, verbose: true });
+  await gpt.train(ds_encoded, { epochs: 1, verbose: true });
 
   const response = await inference(gpt, "What is life?");
   console.log("response", response);
