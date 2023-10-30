@@ -1,5 +1,4 @@
 import wandb from "@wandb/sdk";
-import * as tf from "@tensorflow/tfjs-node";
 import { model } from "gpt-tfjs";
 import { getEncodedDataset } from "./dataset.js";
 import { EncodedDataset, Config } from "./types.js";
@@ -9,10 +8,27 @@ const getName = (args: Config) => {
   return `js_${args.modelType}_lr${args.lr}_bs${args.batchSize}x1_1nodes`;
 };
 
-async function runModel(
+const defaultConfig: Config = {
+  debug: false,
+
+  vocabSize: 50257,
+  chunkSize: 1024,
+  blockSize: 32,
+  verbose: false,
+
+  epochs: 1,
+  maxIter: 3600,
+  batchSize: 16,
+  lr: 0.0002,
+  weightDecay: 1e-3,
+};
+
+// const dataset = await getDataset('openwebtext', config)
+
+export default async function main(
+  tf: any,
   datasetName: string,
-  modelType: string,
-  defaultConfig: Config
+  modelType: string
 ) {
   const date = new Date().toISOString();
   const config = { ...defaultConfig, modelType };
@@ -42,21 +58,3 @@ async function runModel(
 
   await wandb.finish();
 }
-
-const config: Config = {
-  debug: false,
-
-  vocabSize: 50257,
-  chunkSize: 1024,
-  blockSize: 32,
-  verbose: false,
-
-  epochs: 1,
-  maxIter: 3600,
-  batchSize: 16,
-  lr: 0.0002,
-  weightDecay: 1e-3,
-};
-
-// const dataset = await getDataset('openwebtext', config)
-await runModel("wikitext-103/train", "gpt-nano", config);
