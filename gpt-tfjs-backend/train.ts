@@ -4,8 +4,8 @@ import { getEncodedDataset } from "./dataset.js";
 import { EncodedDataset, Config } from "./types.js";
 const { GPTLMHeadModel } = model;
 
-const getName = (args: Config) => {
-  return `js_${args.modelType}_lr${args.lr}_bs${args.batchSize}x1_1nodes`;
+const getName = (args: Config, prefix: string) => {
+  return `${prefix}_js_${args.modelType}_lr${args.lr}_bs${args.batchSize}x1_1nodes`;
 };
 
 const defaultConfig: Config = {
@@ -27,6 +27,7 @@ const defaultConfig: Config = {
 
 export default async function main(
   tf: any,
+  prefix: string,
   datasetName: string,
   modelType: string
 ) {
@@ -36,7 +37,7 @@ export default async function main(
 
   await wandb.init({
     project: "my-project",
-    name: getName(config),
+    name: getName(config, prefix),
     config: { ...config, date },
   });
 
