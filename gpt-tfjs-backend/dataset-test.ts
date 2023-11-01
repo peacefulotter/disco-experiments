@@ -42,7 +42,6 @@ async function test() {
     debug: false,
 
     vocabSize: 50257,
-    chunkSize: 256,
     blockSize: 16,
     verbose: false,
   };

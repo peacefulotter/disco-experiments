@@ -41,12 +41,11 @@ const config: DatasetConfig & ModelConfig = {
   debug: false,
 
   vocabSize: 50257,
-  chunkSize: 1024,
   blockSize: 32,
   verbose: false,
 };
 
-const dataset = await getDataset("wikitext-103/train", config);
+const dataset = await getDataset(tf, "wikitext-103/train", config);
 // const config: DatasetConfig & Record<string, any> = {
 // 	vocabSize: 1024,
 // 	blockSize: 16,

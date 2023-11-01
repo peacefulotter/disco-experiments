@@ -1,5 +1,5 @@
 import { Config, JSONConfig } from "./types.js";
-import _jsonConfig from "../config.json";
+import _jsonConfig from "../config.json" assert { type: "json" };
 
 const jsonConfig = _jsonConfig as JSONConfig;
 
@@ -12,8 +12,7 @@ export const config: Config = {
   nEmbd: jsonConfig.n_embd,
   vocabSize: jsonConfig.vocab_size,
   dropout: jsonConfig.dropout,
-  chunkSize: 1024, // TODO: seq_length
-  blockSize: 32, // TODO: seq_length
+  blockSize: jsonConfig.seq_length,
   verbose: false,
 
   maxIter: jsonConfig.max_iters,

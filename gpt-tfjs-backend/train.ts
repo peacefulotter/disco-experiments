@@ -13,6 +13,8 @@ export default async function main(tf: any, prefix: string) {
     config
   );
 
+  console.log(config, prefix);
+
   await wandb.init({
     project: config.wandbProject,
     name: `${prefix}_${config.wandbName}`,
@@ -30,7 +32,7 @@ export default async function main(tf: any, prefix: string) {
       iter,
       mem: tf.memory().numBytes,
       dt_ms: Date.now() - time,
-      time: Date.now() - start,
+      time_s: (Date.now() - start) / 1000,
     });
     time = Date.now();
   };

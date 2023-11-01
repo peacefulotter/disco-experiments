@@ -51,7 +51,6 @@ export type Dataset = tf.data.Dataset<{ text: string }>;
 export interface DatasetConfig {
   vocabSize: number;
   blockSize: number;
-  chunkSize: number; // 256
   verbose?: boolean;
 }
 
