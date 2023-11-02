@@ -6,6 +6,7 @@ import {
   ModelConfig,
   TrainingSample,
   Dataset,
+  Config,
 } from "./types.js";
 
 async function runModels(
@@ -37,11 +38,10 @@ async function runModels(
   const performance = (end - start) / dataset.size;
 }
 
-const config: DatasetConfig & ModelConfig = {
-  debug: false,
-
+const config: DatasetConfig = {
   vocabSize: 50257,
   blockSize: 32,
+  // batchSize: 16,
   verbose: false,
 };
 

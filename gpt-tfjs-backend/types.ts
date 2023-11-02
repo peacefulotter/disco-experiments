@@ -51,6 +51,7 @@ export type Dataset = tf.data.Dataset<{ text: string }>;
 export interface DatasetConfig {
   vocabSize: number;
   blockSize: number;
+  // batchSize: number;
   verbose?: boolean;
 }
 
@@ -72,7 +73,7 @@ type Callback = (
 export interface TrainConfig {
   epochs?: number;
   maxIter?: number;
-  batchSize?: number;
+  batchSize: number;
   shuffle?: boolean;
   lr?: number;
   weightDecay?: boolean | number;

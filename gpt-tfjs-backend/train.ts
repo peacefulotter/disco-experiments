@@ -27,6 +27,8 @@ export default async function main(tf: any, prefix: string) {
   const start = Date.now();
   let time = start;
   const cb = async (_: any, loss: number, iter: number) => {
+    console.log("here");
+
     wandb.log({
       "train/loss": loss,
       iter,

@@ -2,6 +2,7 @@ import * as tf from "@tensorflow/tfjs-node";
 import { getDataset, getEncodedDataset, inference } from "./dataset.js";
 import { DatasetConfig, ModelConfig } from "./types.js";
 import { model } from "gpt-tfjs";
+import { config } from "./config.js";
 const { GPTLMHeadModel } = model;
 
 interface DolphinFeature {
@@ -37,30 +38,39 @@ async function test() {
   //         return acc
   //     }, {xs: [], ys: []} as PreprocessedData )
   // }
-  const config: DatasetConfig & ModelConfig = {
-    modelType: "gpt-nano",
-    debug: false,
+  // const config: DatasetConfig & ModelConfig = {
+  //   modelType: "gpt-nano",
+  //   debug: false,
 
-    vocabSize: 50257,
-    blockSize: 16,
-    verbose: false,
-  };
+  //   vocabSize: 50257,
+  //   blockSize: 16,
+  //   verbose: false,
+  // };
 
   const ds = await getDataset(tf, "wikitext-103/train", config);
   console.log(ds);
   const iter = await ds.iterator();
   const next = await iter.next();
   console.log(next);
+  // let j = 0;
+  // while (j++ < 100000) {
+  //   await iter.next();
+  //   console.log(j);
+  // }
 
   const ds_encoded = await getEncodedDataset(tf, "wikitext-103/train", config);
   console.log(ds_encoded);
   const iter_encoded = await ds_encoded.iterator();
   const next_encoded = await iter_encoded.next();
-  console.log(next_encoded);
+  console.log("next_encoded", next_encoded);
 
-  // await ds.forEachAsync((a) => {
-  //     console.log(typeof a + " => " + Object.keys(a) + ' -> ' + Object.values(a))
-  // })
+  let i = 0;
+  while (i++ < 1000) {
+    const res = await iter_encoded.next();
+    console.log(i);
+    tf.dispose([res.value.x, res.value.y]);
+  }
+  console.log("after");
 
   const gpt = GPTLMHeadModel(config);
   await gpt.train(ds_encoded, { epochs: 1, verbose: true });
