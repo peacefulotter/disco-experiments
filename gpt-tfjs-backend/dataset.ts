@@ -4,7 +4,12 @@ import { readdir } from "fs/promises";
 // import { decode, encode } from "gpt-tokenizer";
 import { decode, encode } from "gpt-tokenizer/esm/model/text-davinci-003";
 import { model } from "gpt-tfjs";
-import { Dataset, DatasetConfig, EncodedDataset } from "./types.js";
+import {
+  Dataset,
+  DatasetConfig,
+  EncodedDataset,
+  TrainConfig,
+} from "./types.js";
 import { generate } from "gpt-tfjs/src/model.js";
 
 const { GPTLMHeadModel } = model;
@@ -53,12 +58,10 @@ const tokenizedGenerator = (
 ) => {
   return tf.data
     .generator(generator as any)
-    .map((v: { x: number[]; y: number[] }) =>
-      tf.tidy(() => ({
-        x: tf.cast(v.x, "int32"),
-        y: tf.oneHot(tf.cast(v.y, "int32"), vocabSize),
-      }))
-    ) as EncodedDataset;
+    .map((v: { x: number[]; y: number[] }) => ({
+      x: tf.tensor1d(v.x, "int32"),
+      y: tf.oneHot(v.y, vocabSize),
+    })) as EncodedDataset;
 };
 
 export async function getPreprocessedDataset(

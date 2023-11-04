@@ -33,7 +33,8 @@ export default async function main(tf: any, prefix: string) {
   };
   await gpt.train(dataset, {
     ...config,
-    /*shuffle: "batch", */ callbacks: [cb],
+    shuffle: "batch",
+    callbacks: [cb],
   });
 
   await wandb.finish();
