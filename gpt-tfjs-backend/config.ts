@@ -24,8 +24,8 @@ export const config: Config = {
   wandbName: jsonConfig.wandb_name,
 };
 
-const datasetNames = {
-  wikitext: "wikitext-103/train",
+const datasetsDir = {
+  wikitext: "wikitext-103/preprocessed",
 };
 
-export const datasetName = datasetNames[jsonConfig.dataset];
+export const datasetDir = datasetsDir[jsonConfig.dataset];

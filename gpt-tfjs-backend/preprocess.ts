@@ -1,13 +1,13 @@
 import fs from "fs";
 import path from "path";
-import { readdir } from "fs/promises";
 import * as tf from "@tensorflow/tfjs-node";
+import { readdir } from "fs/promises";
 import { encode } from "gpt-tokenizer/esm/model/text-davinci-003";
-import { DatasetConfig, EncodedDataset } from "./types.js";
-import { config } from "./config.js";
+import { Dataset, DatasetConfig, EncodedDataset } from "./types.js";
 
 // For ts-node-esm
 import { fileURLToPath } from "url";
+import { config, datasetDir } from "./config.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -19,46 +19,45 @@ async function sleep(t: number): Promise<void> {
   });
 }
 
-function createEncodedDatasetFromTextStreams(
+function createPreprocessDataset(
   tf: any,
   getStreams: () => fs.ReadStream[],
   config: DatasetConfig
 ) {
   const { blockSize, vocabSize, verbose } = config;
-  let runs = 0;
-  let steps = 0;
   async function* dataGenerator() {
     const streams = getStreams();
-    if (verbose) console.log("Starting data generator:", runs++);
+    if (verbose) console.log("Starting data generator");
     for await (const stream of streams) {
       for await (const chunk of stream) {
         const text = chunk.toString();
         const tokens = encode(text);
-        if (verbose)
-          console.log(
-            `Stream chunk: ${text.slice(0, 40)}... (${tokens.length} tokens)`
-          );
+
+        if (blockSize >= tokens.length) {
+          const x = tokens.slice(0, blockSize);
+          x.push(...new Array(blockSize - x.length + 1).fill(vocabSize - 1));
+          yield x;
+          await sleep(1);
+          continue;
+        }
+
         for (let i = 0; i < tokens.length - blockSize - 1; i += blockSize) {
-          const x = tokens.slice(i, i + blockSize);
-          const y = tokens.slice(i + 1, i + blockSize + 1);
-          yield { x, y };
-          steps++;
+          const x = tokens.slice(i, i + blockSize + 1);
+          yield x;
           await sleep(1);
         }
-        await sleep(1);
       }
     }
   }
 
   return tf.data
     .generator(dataGenerator as any)
-    .map((v: { x: number[]; y: number[] }) => ({
-      x: tf.cast(v.x, "int32"),
-      y: tf.oneHot(tf.cast(v.y, "int32"), vocabSize),
-    })) as EncodedDataset;
+    .map((x: number[]) =>
+      tf.tidy(() => tf.cast(x, "int32"))
+    ) as tf.data.Dataset<tf.Tensor<tf.Rank>>;
 }
 
-async function createDataset(dir: string) {
+async function getFileStreams(dir: string, config: DatasetConfig) {
   const dirPath = path.join(__dirname, "datasets/", dir);
   const files = await readdir(dirPath);
   console.log("Found", files.length, "files in dataset");
@@ -66,12 +65,43 @@ async function createDataset(dir: string) {
     files.map((file) =>
       fs.createReadStream(path.join(dirPath, file), {
         encoding: "utf8",
-        highWaterMark: 256,
+        highWaterMark: config.blockSize,
       })
     );
   return getStreams;
 }
 
-const dir = "wikitext-103/train";
-const getStreams = await createDataset(dir);
-createEncodedDatasetFromTextStreams(tf, getStreams, config);
+const getStreams = await getFileStreams("wikitext-103/train", config);
+const dataset = createPreprocessDataset(tf, getStreams, config);
+
+const maxLength = 4096;
+let buffer = tf.buffer([maxLength, config.blockSize + 1], "int32"); //  tf.zeros([maxLength, config.blockSize + 1], "int32");
+const idx = { pos: 0, save: 0 };
+const dir = path.join(__dirname, "datasets/", "wikitext-103", "preprocessed");
+
+const write = async (buffer: tf.TensorBuffer<tf.Rank, "int32">) => {
+  const res = await fs.promises.writeFile(
+    path.join(dir, `data-${idx.save}.pt`),
+    JSON.stringify(buffer.toTensor().arraySync())
+  );
+  console.log("done", idx, res, tf.memory());
+};
+
+const iter = await dataset.iterator();
+while (true) {
+  const { value: v } = await iter.next();
+
+  const data = v.dataSync();
+  for (let i = 0; i < data.length; i++) {
+    buffer.set(data[i], idx.pos, i);
+  }
+  idx.pos++;
+
+  if (idx.pos >= maxLength) {
+    await write(buffer);
+    idx.save++;
+    idx.pos = 0;
+  }
+
+  v.dispose();
+}

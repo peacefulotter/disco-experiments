@@ -14,6 +14,15 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+type TokenizedGenerator = () => AsyncGenerator<
+  {
+    x: number[];
+    y: number[];
+  },
+  void,
+  unknown
+>;
+
 async function sleep(t: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -22,36 +31,68 @@ async function sleep(t: number): Promise<void> {
   });
 }
 
-function createDataset(
-  tf: any,
-  getStreams: () => fs.ReadStream[],
-  config: DatasetConfig
-) {
-  let runs = 0;
-  let steps = 0;
+export async function getDataset(tf: any, dir: string, config: DatasetConfig) {
+  const getStreams = await getFileStreams(dir, config);
   async function* dataGenerator() {
     const streams = getStreams();
-    if (config.verbose) console.log("Starting data generator:", runs++);
     for await (const stream of streams) {
       for await (const chunk of stream) {
         const text = chunk.toString();
         yield { text };
-        steps++;
         await sleep(1);
       }
     }
   }
-
   return tf.data.generator(dataGenerator as any) as Dataset;
 }
 
-function createEncodedDataset(
+const tokenizedGenerator = (
   tf: any,
-  getStreams: () => fs.ReadStream[],
+  generator: TokenizedGenerator,
+  vocabSize: number
+) => {
+  return tf.data
+    .generator(generator as any)
+    .map((v: { x: number[]; y: number[] }) =>
+      tf.tidy(() => ({
+        x: tf.cast(v.x, "int32"),
+        y: tf.oneHot(tf.cast(v.y, "int32"), vocabSize),
+      }))
+    ) as EncodedDataset;
+};
+
+export async function getPreprocessedDataset(
+  tf: any,
+  dir: string,
+  config: DatasetConfig
+) {
+  const { vocabSize } = config;
+  const filesContentGetter = await getFilesContent(dir);
+
+  const generator: TokenizedGenerator = async function* () {
+    const files = filesContentGetter();
+    for await (const file of files) {
+      const tensors = JSON.parse(file);
+      for (const tokens of tensors) {
+        const x = tokens.slice(0, -1);
+        const y = tokens.slice(1);
+        yield { x, y };
+        await sleep(1);
+      }
+    }
+  };
+  return tokenizedGenerator(tf, generator, vocabSize);
+}
+
+export async function getEncodedDataset(
+  tf: any,
+  dir: string,
   config: DatasetConfig
 ) {
   const { blockSize, vocabSize, verbose } = config;
-  async function* dataGenerator() {
+  const getStreams = await getFileStreams(dir, config);
+
+  const generator: TokenizedGenerator = async function* () {
     const streams = getStreams();
     if (verbose) console.log("Starting data generator");
     for await (const stream of streams) {
@@ -81,21 +122,19 @@ function createEncodedDataset(
         await sleep(1);
       }
     }
-  }
-
-  return tf.data
-    .generator(dataGenerator as any)
-    .map((v: { x: number[]; y: number[] }) =>
-      tf.tidy(() => ({
-        x: tf.cast(v.x, "int32"),
-        y: tf.oneHot(tf.cast(v.y, "int32"), vocabSize),
-      }))
-    ) as EncodedDataset;
+  };
+  return tokenizedGenerator(tf, generator, vocabSize);
 }
 
-async function getFileStreams(dir: string, config: DatasetConfig) {
+const getFilesInDir = async (dir: string): Promise<[string, string[]]> => {
   const dirPath = path.join(__dirname, "datasets/", dir);
   const files = await readdir(dirPath);
+  console.log("Found", files.length, "files in dataset");
+  return [dirPath, files];
+};
+
+async function getFileStreams(dir: string, config: DatasetConfig) {
+  const [dirPath, files] = await getFilesInDir(dir);
   console.log("Found", files.length, "files in dataset");
   const getStreams = () =>
     files.map((file) =>
@@ -107,18 +146,15 @@ async function getFileStreams(dir: string, config: DatasetConfig) {
   return getStreams;
 }
 
-export async function getEncodedDataset(
-  tf: any,
-  dir: string,
-  config: DatasetConfig
-) {
-  const getStreams = await getFileStreams(dir, config);
-  return createEncodedDataset(tf, getStreams, config);
-}
-
-export async function getDataset(tf: any, dir: string, config: DatasetConfig) {
-  const getStreams = await getFileStreams(dir, config);
-  return createDataset(tf, getStreams, config);
+async function getFilesContent(dir: string) {
+  const [dirPath, files] = await getFilesInDir(dir);
+  return () =>
+    files.map(
+      async (file) =>
+        await fs.promises.readFile(path.join(dirPath, file), {
+          encoding: "utf8",
+        })
+    );
 }
 
 export async function inference(model: typeof GPTLMHeadModel, text: string) {

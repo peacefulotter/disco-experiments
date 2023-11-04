@@ -1,19 +1,14 @@
 import wandb from "@wandb/sdk";
 import { model } from "gpt-tfjs";
-import { getEncodedDataset } from "./dataset.js";
-import { EncodedDataset } from "./types.js";
-import { config, datasetName } from "./config.js";
+import { getEncodedDataset, getPreprocessedDataset } from "./dataset.js";
+import { config, datasetDir } from "./config.js";
 const { GPTLMHeadModel } = model;
 
 export default async function main(tf: any, prefix: string) {
   const date = new Date().toISOString();
-  const dataset: EncodedDataset = await getEncodedDataset(
-    tf,
-    datasetName,
-    config
-  );
+  const dataset = await getPreprocessedDataset(tf, datasetDir, config);
 
-  console.log(config, prefix);
+  console.log(config, prefix, dataset);
 
   await wandb.init({
     project: config.wandbProject,
@@ -27,8 +22,6 @@ export default async function main(tf: any, prefix: string) {
   const start = Date.now();
   let time = start;
   const cb = async (_: any, loss: number, iter: number) => {
-    console.log("here");
-
     wandb.log({
       "train/loss": loss,
       iter,
@@ -38,7 +31,10 @@ export default async function main(tf: any, prefix: string) {
     });
     time = Date.now();
   };
-  await gpt.train(dataset, { ...config, callbacks: [cb] });
+  await gpt.train(dataset, {
+    ...config,
+    /*shuffle: "batch", */ callbacks: [cb],
+  });
 
   await wandb.finish();
 }
