@@ -6,7 +6,6 @@ const { GPTLMHeadModel } = model;
 
 const getConfig = async () => {
   const res = await fetch("/api/config");
-  console.log(res);
   const { config } = await res.json();
   return config as Config;
 };
@@ -52,10 +51,6 @@ export default async function main(prefix: string) {
     });
     time = Date.now();
   };
-
-  const iter = await dataset.iterator();
-  const next = await iter.next();
-  console.log(next);
 
   await gpt.train(dataset, {
     ...config,

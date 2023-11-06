@@ -16,8 +16,9 @@ export default function Home() {
   // const data = await res.json()
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between w-screen h-screen p-12">
-      <button onClick={trainGPU} className="px-8 py-2 bg-slate-300 rounded">GPU</button>
+    <main className="flex p-12 gap-4">
+      <button onClick={() => trainGPU('webgl')} className="px-8 py-2 bg-slate-300 rounded">Webgl</button>
+      <button onClick={() => trainGPU('webgpu')} className="px-8 py-2 bg-slate-300 rounded">Webgpu</button>
       {/* <div className='flex gap-4'>
         <Combobox options={profiles} param={'x'} />
         <Combobox options={profiles} param={'y'} />

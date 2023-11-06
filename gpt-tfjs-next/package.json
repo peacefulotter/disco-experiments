@@ -12,7 +12,7 @@
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-popover": "^1.0.7",
     "@radix-ui/react-slot": "^1.0.2",
-    "@tensorflow/tfjs": "4.12.0",
+    "@tensorflow/tfjs": "4.4.0",
     "@wandb/sdk": "^0.5.1",
     "argon2": "^0.27.2",
     "class-variance-authority": "^0.7.0",
