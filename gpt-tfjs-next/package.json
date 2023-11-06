@@ -6,14 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "cypress:open": "cypress open"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-popover": "^1.0.7",
     "@radix-ui/react-slot": "^1.0.2",
     "@tensorflow/tfjs": "4.0.0",
-    "@tensorflow/tfjs-backend-webgpu": "^4.12.0",
+    "@tensorflow/tfjs-backend-webgpu": "4.12.0",
     "@wandb/sdk": "^0.5.1",
     "argon2": "^0.27.2",
     "class-variance-authority": "^0.7.0",
@@ -35,6 +36,7 @@
     "@types/react-dom": "^18",
     "autoprefixer": "^10",
     "aws-sdk": "^2.1473.0",
+    "cypress": "^13.4.0",
     "eslint": "^8",
     "eslint-config-next": "13.5.4",
     "mock-aws-s3": "^4.0.2",
