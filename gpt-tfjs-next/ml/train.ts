@@ -54,7 +54,7 @@ export default async function main(prefix: string) {
 
   await gpt.train(dataset, {
     ...config,
-    shuffle: "batch",
+    // shuffle: "batch",
     callbacks: [cb],
   });
 

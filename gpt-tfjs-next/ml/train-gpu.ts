@@ -1,5 +1,5 @@
 import * as tf from "@tensorflow/tfjs";
-import "@tensorflow/tfjs-backend-webgl";
+import "@tensorflow/tfjs-backend-webgpu";
 import main from "./train";
 
 export default async function trainGPU(backend: string) {
