@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import * as tf from "@tensorflow/tfjs-node";
 import { readdir } from "fs/promises";
-import { encode } from "gpt-tokenizer/esm/model/text-davinci-003";
+import { encode } from "gpt-tokenizer/model/text-davinci-003";
 import { Dataset, DatasetConfig, EncodedDataset } from "./types.js";
 
 // For ts-node-esm

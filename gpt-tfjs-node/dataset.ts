@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { readdir } from "fs/promises";
 // import { decode, encode } from "gpt-tokenizer";
-import { decode, encode } from "gpt-tokenizer/esm/model/text-davinci-003";
+import { decode, encode } from "gpt-tokenizer/model/text-davinci-003";
 import { model } from "gpt-tfjs";
 import {
   Dataset,

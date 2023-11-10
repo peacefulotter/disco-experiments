@@ -2,6 +2,7 @@
 const {webpack} = require("next/dist/compiled/webpack/webpack");
 
 module.exports = {
+    "experimental.instrumentationHook":  true,
     webpack: (config, {isServer}) => {
         if (!isServer) {
             config.resolve = {
