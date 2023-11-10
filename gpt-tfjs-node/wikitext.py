@@ -1,6 +1,6 @@
 import os
 import zipfile
-import urllib
+import urllib.request
 import numpy as np
 import tiktoken
 
@@ -10,6 +10,7 @@ WIKITEXT_DATA_PATH = os.path.join(os.path.dirname(__file__), "datasets/wikitext/
 
 def get_wikitext_data():
     """ Inspired from https://github.com/tysam-code/hlb-gpt """
+    print(os.path.exists(WIKITEXT_DATA_PATH))
     if not os.path.exists(WIKITEXT_DATA_PATH):
         os.makedirs(WIKITEXT_DATA_PATH, exist_ok=True)
         print("downloading data and tokenizing (1-2 min)")
@@ -40,3 +41,7 @@ def get_wikitext_data():
     val_data = np.memmap(os.path.join(WIKITEXT_DATA_PATH, 'val.bin'), dtype=np.uint16, mode='r')
 
     return {'train': train_data, 'val': val_data}
+
+
+if __name__ == '__main__':
+    get_wikitext_data()

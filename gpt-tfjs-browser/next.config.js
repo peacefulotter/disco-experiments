@@ -1,9 +1,11 @@
 /** @type {import('next').NextConfig} */
-const {webpack} = require("next/dist/compiled/webpack/webpack");
+const { webpack } = require("next/dist/compiled/webpack/webpack");
 
 module.exports = {
-    "experimental.instrumentationHook":  true,
-    webpack: (config, {isServer}) => {
+    "experimental": {
+        instrumentationHook: true
+    },
+    webpack: (config, { isServer }) => {
         if (!isServer) {
             config.resolve = {
                 ...config.resolve,

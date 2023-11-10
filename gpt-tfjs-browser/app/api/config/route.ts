@@ -25,7 +25,7 @@ export async function GET(request: Request) {
   const dir = datasetsDir[jsonConfig.dataset as keyof typeof datasetsDir];
   const datasetDir = path.join(
     process.cwd(),
-    "../gpt-tfjs-backend/datasets/",
+    "../gpt-tfjs-node/datasets/",
     dir
   );
   console.log(datasetDir);
