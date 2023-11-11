@@ -18,7 +18,7 @@ export default async function main(tf: any, prefix: string) {
 
   await wandb.init({
     project: config.wandbProject,
-    name: `${prefix}_${config.wandbName}`,
+    name: `node_${prefix}_${config.wandbName}`,
     config: { ...config, date },
   });
 
@@ -37,7 +37,7 @@ export default async function main(tf: any, prefix: string) {
     }
 
     if (iter % config.eval_freq == 0) {
-      const eval_res = await evaluate(tf, model, eval_dataset)
+      const eval_res = await evaluate(tf, model, eval_dataset, config)
       Object.assign(payload, eval_res)
       // TODO: eval like in llm-baselines with table
     }

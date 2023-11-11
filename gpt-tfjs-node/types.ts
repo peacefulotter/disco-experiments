@@ -79,6 +79,7 @@ export interface TrainConfig {
   weightDecay?: boolean | number;
   eval_freq: number;
   eval_seq_prefix: string;
+  max_eval_batches: number;
   callbacks?: Callback[];
 }
 
@@ -110,4 +111,5 @@ export interface JSONConfig {
   wandb_name: string;
   eval_freq: number;
   eval_seq_prefix: string;
+  max_eval_batches: number;
 }

@@ -4,7 +4,8 @@ import '@tensorflow/tfjs-backend-webgl';
 import main from "./train";
 
 export default async function trainGPU(backend: string) {
-  tf.setBackend(backend);
+  console.log(tf.engine().backendNames());
+  await tf.setBackend(backend);
   const tfBackend = tf.getBackend()
   console.log("Backend set to:", tfBackend);
   if (tfBackend === undefined) {
