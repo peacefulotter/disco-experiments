@@ -3,11 +3,11 @@ import path from "path";
 import * as tf from "@tensorflow/tfjs-node";
 import { readdir } from "fs/promises";
 import { encode } from "gpt-tokenizer/model/text-davinci-003";
-import { Dataset, DatasetConfig, EncodedDataset } from "./types.js";
+import { Dataset, DatasetConfig } from "./types.js";
 
 // For ts-node-esm
 import { fileURLToPath } from "url";
-import { config, datasetDir } from "./config.js";
+import { config } from "./config.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -71,37 +71,59 @@ async function getFileStreams(dir: string, config: DatasetConfig) {
   return getStreams;
 }
 
-const getStreams = await getFileStreams("wikitext-103/train", config);
+
+const dataset_name = "wikitext-103"
+const split = 'val'
+const output_dir = path.join(__dirname, "datasets", dataset_name, "preprocessed", split);
+console.log('Preprocessing step will write to:', output_dir);
+
+
+const getStreams = await getFileStreams(path.join(dataset_name, split), config);
 const dataset = createPreprocessDataset(tf, getStreams, config);
 
 const maxLength = 4096;
 let buffer = tf.buffer([maxLength, config.blockSize + 1], "int32"); //  tf.zeros([maxLength, config.blockSize + 1], "int32");
-const idx = { pos: 0, save: 0 };
-const dir = path.join(__dirname, "datasets/", "wikitext-103", "preprocessed");
 
-const write = async (buffer: tf.TensorBuffer<tf.Rank, "int32">) => {
+// Create preprocessed directory if it does not exist
+if (!fs.existsSync(output_dir)){
+    fs.mkdirSync(output_dir, { recursive: true });
+}
+
+const write = async (buffer: tf.TensorBuffer<tf.Rank, "int32">, file_idx: number, size: number) => {
+  const arr = buffer.toTensor().arraySync() as number[][]
+  const data = arr.slice(0, size)
+  console.log(data.length);
+  
   const res = await fs.promises.writeFile(
-    path.join(dir, `data-${idx.save}.pt`),
-    JSON.stringify(buffer.toTensor().arraySync())
+    path.join(output_dir, `data-${file_idx}.pt`),
+    JSON.stringify(data)
   );
-  console.log("done", idx, res, tf.memory());
+  console.log("done", file_idx, res, tf.memory());
 };
 
+let size = 0
+let file_idx = 0
 const iter = await dataset.iterator();
 while (true) {
   const { value: v } = await iter.next();
 
-  const data = v.dataSync();
-  for (let i = 0; i < data.length; i++) {
-    buffer.set(data[i], idx.pos, i);
-  }
-  idx.pos++;
-
-  if (idx.pos >= maxLength) {
-    await write(buffer);
-    idx.save++;
-    idx.pos = 0;
+  if (v !== null) {
+    const data = v.dataSync();
+    for (let i = 0; i < data.length; i++) {
+      buffer.set(data[i], size, i);
+    } 
   }
 
-  v.dispose();
+  size++;
+
+  if (v == null || size >= maxLength) {
+    await write(buffer, file_idx, size);
+    file_idx++;
+    size = 0;
+  }
+
+  if (v !== null)
+    v.dispose();
+  else
+    break
 }

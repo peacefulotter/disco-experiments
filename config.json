@@ -16,5 +16,7 @@
     "num_workers": 4,
     "vocab_size": 50257,
     "wandb_project": "disco-gpt-benchmark",
-    "wandb_name": "gpt-nano_wikitext_bs=16_seq=128_lr=0.001_iter=1200"
+    "wandb_name": "gpt-nano_wikitext_bs=16_seq=128_lr=0.001_iter=1200",
+    "eval_freq": 25,
+    "eval_seq_prefix": "none"
 }

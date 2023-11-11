@@ -22,6 +22,9 @@ export const config: Config = {
 
   wandbProject: jsonConfig.wandb_project,
   wandbName: jsonConfig.wandb_name,
+
+  eval_freq: jsonConfig.eval_freq,
+  eval_seq_prefix: jsonConfig.eval_seq_prefix
 };
 
 const datasetsDir = {

@@ -17,6 +17,8 @@ from optim.sparse import train_sparse
 import distributed
 
 
+
+
 def get_args():
     parser = argparse.ArgumentParser(allow_abbrev=False)
     parser.add_argument('--config_format', default='base', choices=config.registered_formats())
@@ -55,12 +57,13 @@ def main(args):
     args.weight_decay = configs['weight_decay']
     args.wandb_project = configs['wandb_project']
     args.sequence_length = configs['seq_length']
+    args.eval_freq = configs['eval_freq']
+    args.eval_seq_prefix = configs['eval_seq_prefix']
 
     args.acc_steps = 1
-    args.eval_seq_prefix = 'none'
     args.wandb = True
 
-    exp_name = 'llm-baseline_' + configs['wandb_name']
+    exp_name = 'llm-baseline_cpu_' + configs['wandb_name']
 
 
     torch.backends.cuda.matmul.allow_tf32 = True # allows us to make sure we're able to use tensorfloat32 during training

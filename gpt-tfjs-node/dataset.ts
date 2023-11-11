@@ -67,10 +67,12 @@ const tokenizedGenerator = (
 export async function getPreprocessedDataset(
   tf: any,
   dir: string,
+  split: string,
   config: DatasetConfig
 ) {
   const { vocabSize } = config;
-  const filesContentGetter = await getFilesContent(dir);
+  const split_dir = path.join(dir, split)
+  const filesContentGetter = await getFilesContent(split_dir);
 
   const generator: TokenizedGenerator = async function* () {
     const files = filesContentGetter();
