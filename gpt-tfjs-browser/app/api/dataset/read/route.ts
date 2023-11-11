@@ -6,5 +6,6 @@ export async function POST(req: Request) {
   const content = await fs.readFile(path.join(dir, file), {
     encoding: "utf8",
   });
+  console.log(1);
   return Response.json({ content });
 }

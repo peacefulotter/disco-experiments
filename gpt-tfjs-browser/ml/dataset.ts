@@ -55,8 +55,7 @@ export async function getPreprocessedDataset(config: DatasetConfig) {
 
   const generator: TokenizedGenerator = async function* () {
     const files = filesContentGetter();
-    for await (const file of files) {
-      const tensors = JSON.parse(file);
+    for await (const tensors of files) {
       for (const tokens of tensors) {
         const x = tokens.slice(0, -1);
         const y = tokens.slice(1);
@@ -122,8 +121,10 @@ async function getFileStreams(config: DatasetConfig) {
 
 async function getFilesContent(config: DatasetConfig) {
   const { dir, files } = config;
-  return () =>
-    files.map(async (file) => {
+  let n = 0;
+  return async function*() {
+      const file = files[n]
+      console.log('Reading dataset file', file, 'at', n);
       const res = await fetch("/api/dataset/read", {
         method: "POST",
         headers: {
@@ -132,8 +133,9 @@ async function getFilesContent(config: DatasetConfig) {
         body: JSON.stringify({ dir, file }),
       });
       const { content } = await res.json();
-      return content;
-    });
+      n++;
+      yield content as number[][];
+    }
 }
 
 export async function inference(model: typeof GPTLMHeadModel, text: string) {
