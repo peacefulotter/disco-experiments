@@ -4,7 +4,7 @@ import { getPreprocessedDataset } from "./dataset";
 import { Config } from "./types";
 const { GPTLMHeadModel } = model;
 
-const getConfig = async () => {
+export const getConfig = async () => {
   const res = await fetch("/api/config");
   const { config } = await res.json();
   return config as Config;

@@ -1,6 +1,6 @@
-import * as tf from "@tensorflow/tfjs";
-import "@tensorflow/tfjs-backend-webgpu";
-import "@tensorflow/tfjs-backend-webgl";
+import * as tf from '@tensorflow/tfjs-core';
+import '@tensorflow/tfjs-backend-webgpu';
+import '@tensorflow/tfjs-backend-webgl';
 import main from "./train";
 
 export default async function trainGPU(backend: string) {
@@ -11,5 +11,6 @@ export default async function trainGPU(backend: string) {
     console.error('backend is undefined')
     return
   }
-  await main("browser_" + backend);
+  // await main("browser_" + backend);
+  await main("cluster_webgpu")
 }

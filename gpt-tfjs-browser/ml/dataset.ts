@@ -134,7 +134,7 @@ async function getFilesContent(config: DatasetConfig) {
       });
       const { content } = await res.json();
       n++;
-      yield content as number[][];
+      yield JSON.parse(content) as number[][];
     }
 }
 
