@@ -1,18 +1,12 @@
 import fs from "fs";
 import path from "path";
 import { readdir } from "fs/promises";
-// import { decode, encode } from "gpt-tokenizer";
-import { decode, encode } from "gpt-tokenizer/model/text-davinci-003";
-import { model } from "gpt-tfjs";
+import { encode } from "gpt-tokenizer/model/text-davinci-003";
 import {
   Dataset,
   DatasetConfig,
   EncodedDataset,
-  TrainConfig,
 } from "./types.js";
-import { generate } from "gpt-tfjs/src/model.js";
-
-const { GPTLMHeadModel } = model;
 
 // For ts-node-esm
 import { fileURLToPath } from "url";
@@ -160,20 +154,4 @@ async function getFilesContent(dir: string) {
           encoding: "utf8",
         })
     );
-}
-
-export async function inference(model: typeof GPTLMHeadModel, text: string) {
-  const tokens = encode(text);
-  const outputs = await generate(
-    model,
-    tokens,
-    { maxLength: 32, temperature: 1, doSample: false },
-    async (g: any) => {
-      // const idx = g.idxNext;
-      // const t = decode(idx[0]);
-      console.log(` time: ${g.timePerToken}`);
-      await new Promise((r) => setTimeout(r, 1));
-    }
-  );
-  return decode(outputs[0]);
 }

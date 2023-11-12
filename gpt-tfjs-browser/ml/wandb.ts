@@ -1,10 +1,11 @@
 import { Config } from "./types"
 
 
-export const init = async (save: any[], config: Config, prefix: string, date: string) =>  {
-    save.push({
-        config, prefix, date
-    })
+export const init = async (save: any, config: Config, prefix: string, date: string) =>  {
+    const { files, ...rest } = config
+    save.init = {
+        config: rest, prefix, date
+    }
 
     // await fetch("/api/wandb/init", {
     //   method: "POST",
@@ -19,8 +20,8 @@ export const init = async (save: any[], config: Config, prefix: string, date: st
     // });
 }
 
-export const log = async (save: any[], payload: any) => {
-    save.push(payload)
+export const log = async (save: any, payload: any) => {
+    save.logs.push(payload)
     // await fetch("/api/wandb/log", {
     //   method: "POST",
     //   headers: {
@@ -30,7 +31,9 @@ export const log = async (save: any[], payload: any) => {
     // });
 }
 
-export const finish = async (save: any[]) => {
+export const finish = async (save: any) => {
+    console.log(save);
+    
     // await fetch("/api/wandb/finish", {
     //   method: "POST",
     // });

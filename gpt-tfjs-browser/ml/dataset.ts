@@ -1,10 +1,8 @@
-import path from "path";
 import * as tf from '@tensorflow/tfjs'
 import { decode, encode } from "gpt-tokenizer/model/text-davinci-003";
 import { model } from "gpt-tfjs";
 import {
   DatasetConfig,
-  EncodedDataset,
 } from "./types.js";
 import { generate } from "gpt-tfjs/src/model.js";
 
@@ -42,7 +40,7 @@ const tokenizedGenerator = (
 export async function getPreprocessedDataset(
   config: DatasetConfig
 ) {
-  const { dir, split, vocabSize } = config;
+  const { dir, vocabSize } = config;
   const filesContentGetter = await getFilesContent(config, dir);
 
   const generator: TokenizedGenerator = async function* () {
@@ -63,6 +61,8 @@ async function getFilesContent(config: DatasetConfig, dir: string) {
   const { files } = config;
   let n = 0;
   return async function*() {
+      if (n >= files.length)
+        n = 0
       const file = files[n]
       console.log('Reading dataset file', file, 'at', n);
       const res = await fetch("/api/dataset/read", {

@@ -25,12 +25,10 @@ export default async function main(prefix: string) {
   const train_config = await getConfig('train');
   const eval_config = await getConfig('val');
   const dataset = await getPreprocessedDataset(train_config);
-  let eval_dataset = await getPreprocessedDataset(eval_config) as tf.data.Dataset<tf.TensorContainer>;
-  eval_dataset = eval_dataset.batch(train_config.batchSize)
 
   console.log(train_config);
 
-  const save: any[] = []
+  const save: any = { init: undefined, logs: [] }
   await wandb.init(save, train_config, prefix, date)
 
   console.log("Running", train_config.modelType);
@@ -50,7 +48,7 @@ export default async function main(prefix: string) {
     }
 
     if (iter % eval_config.eval_freq == 0) {
-      const eval_res = await evaluate(tf, model, eval_dataset, eval_config)
+      const eval_res = await evaluate(tf, model, eval_config)
       Object.assign(payload, eval_res)
       // TODO: eval like in llm-baselines with table
     }

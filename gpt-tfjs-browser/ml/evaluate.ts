@@ -1,9 +1,13 @@
-import { Config, EncodedDataset } from "./types.js"
+import * as tf from '@tensorflow/tfjs'
+import { Config } from "./types.js"
+import { getPreprocessedDataset } from './dataset';
 
 
 
-export default async function evaluate(tf: any, model: any, eval_dataset: EncodedDataset, config: Config) 
+export default async function evaluate(tf: any, model: any, config: Config) 
 {
+    let eval_dataset = await getPreprocessedDataset(config) as tf.data.Dataset<tf.TensorContainer>;
+    eval_dataset = eval_dataset.batch(config.batchSize)
     console.log('Evaluating..');
 
     const iter = await eval_dataset.iterator()
