@@ -6,11 +6,6 @@ const datasetsDir = {
   wikitext: "wikitext-103/preprocessed",
 };
 
-// For ts-node-esm
-// import { fileURLToPath } from "url";
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
-
 const getJSONConfig = async () => {
   const symlinkPath = path.join(process.cwd(), "public/config.json");
   const realPath = await fs.readlink(symlinkPath, "utf-8");
@@ -19,23 +14,24 @@ const getJSONConfig = async () => {
   return JSON.parse(textConfig) as JSONConfig;
 };
 
-export async function GET(request: Request) {
+export async function POST(req: Request) {
+  const { split } = await req.json()
   const jsonConfig = await getJSONConfig();
 
   const dir = datasetsDir[jsonConfig.dataset as keyof typeof datasetsDir];
   const datasetDir = path.join(
     process.cwd(),
     "../gpt-tfjs-node/datasets/",
-    dir
+    dir,
+    split
   );
-  console.log(datasetDir);
-
   const files = await fs.readdir(datasetDir);
-  console.log("Found", files.length, "files in dataset");
+  console.log("Found", files.length, "files in dataset under", datasetDir);
 
   const config: Config = {
     debug: false,
     dir: datasetDir,
+    split,
     files,
 
     modelType: jsonConfig.model,
@@ -54,6 +50,9 @@ export async function GET(request: Request) {
 
     wandbProject: jsonConfig.wandb_project,
     wandbName: jsonConfig.wandb_name,
+    eval_freq: jsonConfig.eval_freq,
+    eval_seq_prefix: jsonConfig.eval_seq_prefix,
+    max_eval_batches: jsonConfig.max_eval_batches
   };
 
   return Response.json({ config });

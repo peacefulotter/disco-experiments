@@ -2,7 +2,6 @@ import wandb from "@wandb/sdk";
 import { model } from "gpt-tfjs";
 import { getPreprocessedDataset } from "./dataset.js";
 import { config, datasetDir } from "./config.js";
-import { EncodedDataset } from "./types.js";
 import evaluate from "./evaluate.js";
 const { GPTLMHeadModel } = model;
 

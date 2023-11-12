@@ -2,63 +2,68 @@ import * as tf from "@tensorflow/tfjs";
 import { model } from "gpt-tfjs";
 import { getPreprocessedDataset } from "./dataset";
 import { Config } from "./types";
+import evaluate from "./evaluate";
+import * as wandb from './wandb'
 const { GPTLMHeadModel } = model;
 
-export const getConfig = async () => {
-  const res = await fetch("/api/config");
+export const getConfig = async (split: string) => {
+  console.log('Getting config on', split, 'split');
+  
+  const res = await fetch("/api/config", {
+     method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ split }),
+    });
   const { config } = await res.json();
   return config as Config;
 };
 
 export default async function main(prefix: string) {
   const date = new Date().toISOString();
-  const config = await getConfig();
-  const dataset = await getPreprocessedDataset(config);
+  const train_config = await getConfig('train');
+  const eval_config = await getConfig('val');
+  const dataset = await getPreprocessedDataset(train_config);
+  let eval_dataset = await getPreprocessedDataset(eval_config) as tf.data.Dataset<tf.TensorContainer>;
+  eval_dataset = eval_dataset.batch(train_config.batchSize)
 
-  console.log(config);
+  console.log(train_config);
 
-  await fetch("/api/wandb/init", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      config,
-      prefix,
-      date,
-    }),
-  });
+  const save: any[] = []
+  await wandb.init(save, train_config, prefix, date)
 
-  console.log("Running", config.modelType);
-  const gpt = GPTLMHeadModel(config);
+  console.log("Running", train_config.modelType);
+  const gpt = GPTLMHeadModel(train_config);
 
   const start = Date.now();
   let time = start;
-  const cb = async (_: any, loss: number, iter: number) => {
+  const cb = async (model: any, loss: number, iter: number) => {
     console.log(iter);
-    await fetch("/api/wandb/log", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        "train/loss": loss,
-        iter,
-        mem: tf.memory().numBytes,
-        dt_ms: Date.now() - time,
-        time_s: (Date.now() - start) / 1000,
-      }),
-    });
+    
+    const payload = {
+      "train/loss": loss,
+      iter,
+      mem: tf.memory().numBytes,
+      dt_ms: Date.now() - time,
+      time_s: (Date.now() - start) / 1000,
+    }
+
+    if (iter % eval_config.eval_freq == 0) {
+      const eval_res = await evaluate(tf, model, eval_dataset, eval_config)
+      Object.assign(payload, eval_res)
+      // TODO: eval like in llm-baselines with table
+    }
+
+    await wandb.log(save, payload)
     time = Date.now();
   };
 
   await gpt.train(dataset, {
-    ...config,
-    // shuffle: "batch",
+    ...train_config,
+    shuffle: "batch",
     callbacks: [cb],
   });
 
-  await fetch("/api/wandb/finish", {
-    method: "POST",
-  });
+  await wandb.finish(save)
 }

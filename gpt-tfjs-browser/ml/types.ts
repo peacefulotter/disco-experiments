@@ -45,7 +45,7 @@ export type DatasetSample = {
   y: tf.Tensor<tf.Rank>;
 };
 
-export type EncodedDataset = tf.data.Dataset<DatasetSample>;
+export type EncodedDataset = tf.data.Dataset<tf.TensorContainer>;
 export type Dataset = tf.data.Dataset<{ text: string }>;
 
 export interface DatasetConfig {
@@ -53,8 +53,9 @@ export interface DatasetConfig {
   blockSize: number;
   // batchSize: number;
   verbose?: boolean;
-  files: string[];
   dir: string;
+  split: string;
+  files: string[]
 }
 
 export interface ModelConfig {
@@ -79,6 +80,9 @@ export interface TrainConfig {
   shuffle?: boolean;
   lr?: number;
   weightDecay?: boolean | number;
+  eval_freq: number;
+  eval_seq_prefix: string;
+  max_eval_batches: number;
   callbacks?: Callback[];
 }
 
@@ -108,4 +112,7 @@ export interface JSONConfig {
   vocab_size: number;
   wandb_project: string;
   wandb_name: string;
+  eval_freq: number;
+  eval_seq_prefix: string;
+  max_eval_batches: number;
 }

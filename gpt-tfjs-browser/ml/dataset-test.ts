@@ -3,7 +3,7 @@ import { getConfig } from "./train";
 
 
 export default async function datasetTest() {
-  const config = await getConfig();
+  const config = await getConfig('val');
   const dataset = await getPreprocessedDataset(config);
   const iter = await dataset.iterator()
   const next = await iter.next()
