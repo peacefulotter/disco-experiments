@@ -1,16 +1,11 @@
 
 
-import * as tf from '@tensorflow/tfjs-node-gpu'
+import * as tf from '@tensorflow/tfjs'
 import { model } from "gpt-tfjs";
-import { getPreprocessedDataset } from "./dataset.js";
-import { config, datasetDir } from "./config.js";
-
-tf.setBackend('tensorflow')
-
+import { getPreprocessedDataset } from "./dataset";
+import { getConfig } from './train';
+import setBackend, { BackendName } from './backend';
 const { GPTLMHeadModel } = model;
-
-const dataset = await getPreprocessedDataset(tf, datasetDir, 'val', config);
-const gpt = GPTLMHeadModel(config);
 
 function prepareIdx(idx: any) {
     tf.tidy(() => {
@@ -65,18 +60,35 @@ function generateOnce(model: any, idx: any, config: any) {
     }
 }
 
-const maxNewTokens = 20
-const params = { maxLength: 32, temperature: 1, ...config }
+export default async function inference(backendName: BackendName) {
+    await setBackend(backendName)
+    
+    const config = await getConfig('val')
+    const dataset = await getPreprocessedDataset(config);
+    const gpt = GPTLMHeadModel(config);
 
-const iter = await dataset.iterator()
-for (let i = 0; i < 8; i++) {
-    const { value } = await iter.next()
-    const { x: tokens } = value 
-    const idx = prepareIdx(tokens)
-    for (let step = 0; step < maxNewTokens; step++) {
-        const { timePerToken, timePrediction } = generateOnce(gpt.model, idx, params)
-        console.log(`prediction time: ${timePrediction}, time per token: ${timePerToken}`);
-        await new Promise((r) => setTimeout(r, 1));
+    const maxNewTokens = 20
+    const params = { maxLength: 32, temperature: 1, ...config }
+    let stats: [number, number, number] = [0, 0, 0]
+
+    const iter = await dataset.iterator()
+    for (let i = 0; i < 8; i++) {
+        const { value } = await iter.next()
+        const { x: tokens } = value 
+        const idx = prepareIdx(tokens)
+        for (let step = 0; step < maxNewTokens; step++) {
+            const { timePerToken, timePrediction } = generateOnce(gpt.model, idx, params)
+            console.log(`prediction time: ${timePrediction}, time per token: ${timePerToken}`);
+            stats[0] += timePrediction
+            stats[1] += timePerToken
+            stats[2] += 1
+            await new Promise((r) => setTimeout(r, 1));
+        }
     }
-}
+
+    console.log('Avg: prediction time:', stats[0] / stats[2], ', time per token:', stats[1] / stats[2]);
+} 
+
+
+
 

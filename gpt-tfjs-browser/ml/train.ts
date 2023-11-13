@@ -4,6 +4,7 @@ import { getPreprocessedDataset } from "./dataset";
 import { Config } from "./types";
 import evaluate from "./evaluate";
 import * as wandb from './wandb'
+import setBackend, { BackendName } from "./backend";
 const { GPTLMHeadModel } = model;
 
 export const getConfig = async (split: string) => {
@@ -20,7 +21,10 @@ export const getConfig = async (split: string) => {
   return config as Config;
 };
 
-export default async function main(prefix: string) {
+export default async function main(prefix: string, backendName: BackendName) {
+
+  await setBackend(backendName)
+
   const date = new Date().toISOString();
   const train_config = await getConfig('train');
   const eval_config = await getConfig('val');
@@ -29,7 +33,7 @@ export default async function main(prefix: string) {
   console.log(train_config);
 
   const save: any = { init: undefined, logs: [] }
-  await wandb.init(save, train_config, prefix, date)
+  await wandb.init(save, train_config, prefix + '_' + backendName, date)
 
   console.log("Running", train_config.modelType);
   const gpt = GPTLMHeadModel(train_config);

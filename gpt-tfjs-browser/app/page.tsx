@@ -1,6 +1,7 @@
 'use client'
 
 import datasetTest from "@/ml/dataset-test";
+import inference from "@/ml/inference";
 // import Chart from "@/components/Chart";
 // import Combobox from "@/components/Combobox";
 import trainGPU from "@/ml/train-gpu";
@@ -23,6 +24,8 @@ export default function Home() {
       <button onClick={() => trainGPU('webgpu')} className="px-8 py-2 bg-slate-300 rounded">Webgpu</button>
       <button onClick={() => datasetTest()} className="px-8 py-2 bg-slate-300 rounded">Dataset test</button>
       <button onClick={() => wandbTest()} className="px-8 py-2 bg-slate-300 rounded">WandB test</button>
+      <button onClick={() => inference('webgl')} className="px-8 py-2 bg-slate-300 rounded">Inference webgl</button>
+      <button onClick={() => inference('webgpu')} className="px-8 py-2 bg-slate-300 rounded">Inference webgpu</button>
       {/* <div className='flex gap-4'>
         <Combobox options={profiles} param={'x'} />
         <Combobox options={profiles} param={'y'} />
