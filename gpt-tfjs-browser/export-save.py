@@ -6,10 +6,11 @@ import wandb
 with open('save.json', 'r') as f:
     save = json.load(f)
 
-init = save[0]
+print(save.keys())
+init = save['init']
 config = init['config']
 wandb.init(config=config, project=config['wandbProject'], name=config['wandbName'])
-for log in save[1:]:
+for log in save['logs']:
     wandb.log(log)
 
 wandb.finish()
