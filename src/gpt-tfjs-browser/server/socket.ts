@@ -7,11 +7,11 @@ const initWebsockets = async (server: Server) => {
     wss.on('connection', async (ws) => {
         console.log('ON CONNECTION')
 
-        ws.on('message', (data) => {
+        ws.on('message', async (data) => {
             console.log('received: ', data)
             const payload = JSON.stringify({
-                type: 'CONNECTED',
-                data: "I'm connected!",
+                x: [1, 2, 3],
+                y: [4, 5, 6],
             })
             ws.send(payload)
         })

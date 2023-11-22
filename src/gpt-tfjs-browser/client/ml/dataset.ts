@@ -4,15 +4,12 @@ import * as tf from '@tensorflow/tfjs'
 import path from 'path'
 import { Config, EncodedDataset } from '~/tfjs-types'
 
-type TokenizedIterator = AsyncIterator<
-    {
-        // x: number[]
-        // y: number[]
-        working: string
-    },
-    void,
-    unknown
->
+type TokenizedSample = {
+    x: number[]
+    y: number[]
+}
+
+type TokenizedIterator = AsyncIterator<TokenizedSample, void, unknown>
 
 async function sleep(t: number): Promise<void> {
     return new Promise((resolve) => {
@@ -23,15 +20,18 @@ async function sleep(t: number): Promise<void> {
 }
 
 const tokenizedIterator = (
-    generator: TokenizedIterator,
+    iterator: TokenizedIterator,
     vocabSize: number
 ): EncodedDataset => {
     return tf.data
-        .generator(generator as any)
-        .map((v: any & { x: number[]; y: number[] }) => ({
-            x: tf.tensor1d(v.x, 'int32'),
-            y: tf.oneHot(v.y, vocabSize),
-        }))
+        .generator(() => iterator as any)
+        .map((v: any & TokenizedSample) => {
+            console.log('IN MAP', v)
+            return {
+                x: tf.tensor1d(v.x, 'int32'),
+                y: tf.oneHot(v.y, vocabSize),
+            }
+        })
 }
 
 function getFileStream(config: Config, datasetDir: string, file: string) {
@@ -96,29 +96,40 @@ export async function getPreprocessedDataset(config: Config, split: string) {
     return generator()
 }
 
+const getWebSocket = async () =>
+    new Promise<WebSocket>((resolve) => {
+        const brokerURL = 'ws://localhost:3001/ws'
+        const ws = new WebSocket(brokerURL)
+        ws.onopen = () => {
+            console.log('websocket open')
+            resolve(ws)
+        }
+    })
+
 // call from client
 export async function getFrontendDataset(config: Config, split: string) {
     const { vocabSize } = config
 
-    const brokerURL = 'ws://localhost:3001/ws'
+    const ws = await getWebSocket()
 
-    const ws = new WebSocket(brokerURL)
-    ws.onopen = () => {
-        console.log('websocket open')
-    }
-
-    type Res = { working: string }
-    const iterator: AsyncIterator<Res> = {
+    const iterator: AsyncIterator<TokenizedSample> = {
         next: () =>
-            new Promise<{ done: boolean; value: Res }>((resolve) => {
-                ws.onmessage = (payload) => {
-                    console.log('payload', payload.data)
-                    const res = { working: 'yes' }
-                    resolve({ done: payload.data !== null, value: res })
+            new Promise<{ done: boolean; value: TokenizedSample }>(
+                (resolve) => {
+                    ws.onmessage = (payload) => {
+                        console.log('payload', payload.data)
+                        const value = JSON.parse(
+                            payload.data
+                        ) as TokenizedSample
+                        console.log(value)
+                        resolve({ done: payload.data === null, value })
+                    }
+                    ws.send(JSON.stringify({ split }))
                 }
-                ws.send(JSON.stringify({ split }))
-            }),
+            ),
     }
+
+    console.log(await iterator.next())
 
     // const res = await fetch('/api/dataset/read', {
     //     method: 'POST',
