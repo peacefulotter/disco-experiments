@@ -1,9 +1,9 @@
-import { getPreprocessedDataset } from './dataset'
+import { getFrontendDataset } from './dataset'
 import getConfig from './config'
 
 export default async function datasetTest() {
-    const config = await getConfig('val')
-    const dataset = await getPreprocessedDataset(config)
+    const config = await getConfig()
+    const dataset = await getFrontendDataset(config, 'valid')
     const iter = await dataset.iterator()
     const next = await iter.next()
     console.log(next)

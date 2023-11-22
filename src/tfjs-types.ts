@@ -1,5 +1,5 @@
 import * as tf from '@tensorflow/tfjs'
-import trainConfig from './train-config.js'
+import config from './train-config.js'
 
 export type Models = 'gpt-nano' | 'gpt-micro' | 'gpt-mini' //, 'gpt2', 'gpt2-medium', 'gpt2-large', 'gpt2-xl']
 
@@ -12,10 +12,4 @@ export type Callback = (
     iter: number
 ) => Promise<void> | void
 
-export type TrainConfig = typeof trainConfig
-export type Config = TrainConfig & {
-    dir: string
-    split: string
-    files: string[]
-    callbacks?: Callback[]
-}
+export type Config = typeof config

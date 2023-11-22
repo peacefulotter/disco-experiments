@@ -38,9 +38,9 @@ const baseConfig = {
     maxEvalBatches: 24,
 } as const
 
-const trainConfig = {
+const config = {
     ...baseConfig,
     wandbName: `${modelType}_${dataset}_bs=${batchSize}_seq=${seqLength}_lr=${lr}_iter=${maxIter}`,
 } as const
 
-export default trainConfig
+export default config

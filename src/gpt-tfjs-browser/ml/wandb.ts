@@ -6,9 +6,8 @@ export const init = async (
     prefix: string,
     date: string
 ) => {
-    const { files, ...rest } = config
     save.init = {
-        config: rest,
+        config,
         prefix,
         date,
     }

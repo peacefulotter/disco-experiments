@@ -1,8 +1,8 @@
 import { Config } from '~/tfjs-types.js'
-import { getPreprocessedDataset } from './dataset'
+import { getFrontendDataset } from './dataset'
 
 export default async function evaluate(tf: any, model: any, config: Config) {
-    let evalDataset = await getPreprocessedDataset(config)
+    let evalDataset = await getFrontendDataset(config, 'valid')
     evalDataset = evalDataset.batch(config.batchSize)
     console.log('Evaluating..')
 

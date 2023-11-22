@@ -13,12 +13,11 @@ async function getFileStreams(datasetDir: string) {
 
     const streams = files
         .filter((file) => file.endsWith('pp'))
-        .map((file) => ({
-            file,
-            stream: fs.createReadStream(path.join(datasetDir, file), {
-                highWaterMark: 128, // set this to seq length * 2 because we store uint16
-            }),
-        }))
+        .map((file) =>
+            fs.createReadStream(path.join(datasetDir, file), {
+                highWaterMark: 128, // set this to seq length * 2 because we store uint16,
+            })
+        )
     return streams
 }
 
@@ -32,7 +31,7 @@ const toUInt16 = (low: number, high: number) => {
     return (high << 8) | low
 }
 
-const preprocessTest = async (file: string, stream: fs.ReadStream) => {
+const preprocessTest = async (stream: fs.ReadStream) => {
     const iter = stream.iterator()
     const { value: chunk } = await iter.next()
 
@@ -48,7 +47,7 @@ const preprocessTest = async (file: string, stream: fs.ReadStream) => {
     stream.close()
 }
 
-for await (const { file, stream } of streams) {
-    await preprocessTest(file, stream)
+for await (const stream of streams) {
+    await preprocessTest(stream)
     throw new Error('stop')
 }

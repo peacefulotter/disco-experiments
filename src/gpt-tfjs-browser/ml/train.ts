@@ -1,6 +1,6 @@
 import * as tf from '@tensorflow/tfjs'
 import { model } from 'gpt-tfjs'
-import { getPreprocessedDataset } from './dataset'
+import { getFrontendDataset } from './dataset'
 import evaluate from './evaluate'
 import * as wandb from './wandb'
 import setBackend, { BackendName } from './backend'
@@ -12,17 +12,16 @@ export default async function main(prefix: string, backendName: BackendName) {
     await setBackend(backendName)
 
     const date = new Date().toISOString()
-    const trainConfig = await getConfig('train')
-    const evalConfig = await getConfig('val')
-    const dataset = await getPreprocessedDataset(trainConfig)
+    const config = await getConfig()
+    const dataset = await getFrontendDataset(config, 'train')
 
-    console.log(trainConfig)
+    console.log(config)
 
     const save: any = { init: undefined, logs: [] }
-    await wandb.init(save, trainConfig, prefix + '_' + backendName, date)
+    await wandb.init(save, config, prefix + '_' + backendName, date)
 
-    console.log('Running', trainConfig.modelType)
-    const gpt = GPTLMHeadModel(trainConfig)
+    console.log('Running', config.modelType)
+    const gpt = GPTLMHeadModel(config)
 
     const start = Date.now()
     let time = start
@@ -37,8 +36,8 @@ export default async function main(prefix: string, backendName: BackendName) {
             time_s: (Date.now() - start) / 1000,
         }
 
-        if (iter % evalConfig.evalFreq == 0) {
-            const eval_res = await evaluate(tf, model, evalConfig)
+        if (iter % config.evalFreq == 0) {
+            const eval_res = await evaluate(tf, model, config)
             Object.assign(payload, eval_res)
             // TODO: eval like in llm-baselines with table
         }
@@ -48,10 +47,10 @@ export default async function main(prefix: string, backendName: BackendName) {
     }
 
     await gpt.train(dataset, {
-        ...trainConfig,
+        ...config,
         shuffle: 'batch',
         callbacks: [cb],
     })
 
-    await wandb.finish(save, trainConfig)
+    await wandb.finish(save, config)
 }

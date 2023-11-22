@@ -1,6 +1,6 @@
 import * as tf from '@tensorflow/tfjs'
 import { model } from 'gpt-tfjs'
-import { getPreprocessedDataset } from './dataset'
+import { getFrontendDataset, getPreprocessedDataset } from './dataset'
 import getConfig from './config'
 import setBackend, { BackendName } from './backend'
 const { GPTLMHeadModel } = model
@@ -64,8 +64,8 @@ function generateOnce(model: any, idx: any, config: any) {
 export default async function inference(backendName: BackendName) {
     await setBackend(backendName)
 
-    const config = await getConfig('val')
-    const dataset = await getPreprocessedDataset(config)
+    const config = await getConfig()
+    const dataset = await getFrontendDataset(config, 'valid')
     const gpt = GPTLMHeadModel(config)
 
     const maxNewTokens = 20
