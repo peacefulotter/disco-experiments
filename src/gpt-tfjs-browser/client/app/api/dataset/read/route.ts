@@ -4,12 +4,11 @@ import config from '~/train-config'
 function iteratorToStream(iterator: any) {
     return new ReadableStream({
         async pull(controller) {
-            const { value, done } = await iterator.next()
-            if (done) {
-                controller.close()
-            } else {
-                controller.enqueue(value)
+            for await (const value of iterator) {
+                const text = JSON.stringify(value)
+                controller.enqueue(text)
             }
+            controller.close()
         },
     })
 }

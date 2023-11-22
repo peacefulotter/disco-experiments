@@ -4,10 +4,11 @@ import * as tf from '@tensorflow/tfjs'
 import path from 'path'
 import { Config, EncodedDataset } from '~/tfjs-types'
 
-type TokenizedGenerator = () => AsyncGenerator<
+type TokenizedIterator = AsyncIterator<
     {
-        x: number[]
-        y: number[]
+        // x: number[]
+        // y: number[]
+        working: string
     },
     void,
     unknown
@@ -21,8 +22,8 @@ async function sleep(t: number): Promise<void> {
     })
 }
 
-const tokenizedGenerator = (
-    generator: TokenizedGenerator,
+const tokenizedIterator = (
+    generator: TokenizedIterator,
     vocabSize: number
 ): EncodedDataset => {
     return tf.data
@@ -51,8 +52,7 @@ const toUInt16 = (low: number, high: number) => {
     return (high << 8) | low
 }
 
-const getDatasetFile = async (config: Config, split: string) => {
-    const datasetDir = path.join('..', process.cwd(), config.dataset)
+const getDatasetFile = async (datasetDir: string, split: string) => {
     const files = await readdir(datasetDir)
     const file = files.filter((f) => f.includes(split))[0]
     console.log('Found', files.length, 'files in dataset under', datasetDir)
@@ -63,13 +63,13 @@ const getDatasetFile = async (config: Config, split: string) => {
 // call from server
 export async function getPreprocessedDataset(config: Config, split: string) {
     const { dataset } = config
-    const datasetDir = path.join('..', __dirname, 'datasets', dataset)
+    const datasetDir = path.join(process.cwd(), '..', 'datasets', dataset)
     console.log('Preprocessed dataset located at:', datasetDir)
 
-    const file = await getDatasetFile(config, split)
+    const file = await getDatasetFile(datasetDir, split)
     const stream = getFileStream(config, datasetDir, file)
 
-    const generator: TokenizedGenerator = async function* () {
+    const generator = async function* () {
         const iter = stream.iterator()
         while (true) {
             const { value: chunk } = await iter.next()
@@ -84,6 +84,7 @@ export async function getPreprocessedDataset(config: Config, split: string) {
             }
 
             for (let i = 0; i < config.batchSize; i++) {
+                console.log(i)
                 const x = tokens.slice(i, i + config.blockSize)
                 const y = tokens.slice(i + 1, i + config.blockSize + 1)
                 yield { x, y }
@@ -92,22 +93,43 @@ export async function getPreprocessedDataset(config: Config, split: string) {
         }
         stream.close()
     }
-    return generator
+    return generator()
 }
 
 // call from client
 export async function getFrontendDataset(config: Config, split: string) {
     const { vocabSize } = config
-    const res = await fetch('/api/dataset/read', {
-        method: 'POST',
-        body: JSON.stringify({
-            split,
-        }),
-    })
-    console.log(res)
-    const { content } = await res.json()
-    console.log(content)
-    const generator = undefined as any
+
+    const brokerURL = 'ws://localhost:3001/ws'
+
+    const ws = new WebSocket(brokerURL)
+    ws.onopen = () => {
+        console.log('websocket open')
+    }
+
+    type Res = { working: string }
+    const iterator: AsyncIterator<Res> = {
+        next: () =>
+            new Promise<{ done: boolean; value: Res }>((resolve) => {
+                ws.onmessage = (payload) => {
+                    console.log('payload', payload.data)
+                    const res = { working: 'yes' }
+                    resolve({ done: payload.data !== null, value: res })
+                }
+                ws.send(JSON.stringify({ split }))
+            }),
+    }
+
+    // const res = await fetch('/api/dataset/read', {
+    //     method: 'POST',
+    //     body: JSON.stringify({
+    //         split,
+    //     }),
+    // })
+    // console.log('RESPONSE', res)
+    // const { content } = await res.json()
+    // console.log('RESPONSE', content)
+    // const generator = undefined as any
     //JSON.parse(content) as number[][]
-    return tokenizedGenerator(generator, vocabSize)
+    return tokenizedIterator(iterator, vocabSize)
 }

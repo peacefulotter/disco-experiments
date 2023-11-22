@@ -1,3 +1,4 @@
+'use client'
 import { getFrontendDataset } from './dataset'
 import getConfig from './config'
 
