@@ -10,7 +10,11 @@
         "declaration": true,
         "emitDeclarationOnly": false,
         "skipLibCheck": true,
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "paths": {
+            "@/*": ["./*"],
+            "~/*": ["../*"]
+        }
     },
     "include": [
         "./**/*.ts",

@@ -1,25 +1,20 @@
-import * as tf from '@tensorflow/tfjs'
-import { Config } from "./types.js"
-import { getPreprocessedDataset } from './dataset';
+import { Config } from '~/tfjs-types.js'
+import { getPreprocessedDataset } from './dataset'
 
+export default async function evaluate(tf: any, model: any, config: Config) {
+    let evalDataset = await getPreprocessedDataset(config)
+    evalDataset = evalDataset.batch(config.batchSize)
+    console.log('Evaluating..')
 
-
-export default async function evaluate(tf: any, model: any, config: Config) 
-{
-    let eval_dataset = await getPreprocessedDataset(config) as tf.data.Dataset<tf.TensorContainer>;
-    eval_dataset = eval_dataset.batch(config.batchSize)
-    console.log('Evaluating..');
-
-    const iter = await eval_dataset.iterator()
+    const iter = await evalDataset.iterator()
     let losses = []
     const acc: [number, number] = [0, 0]
 
-    let iteration = 0;
-    while (iteration < config.max_eval_batches) {
+    let iteration = 0
+    while (iteration < config.maxEvalBatches) {
         const next = await iter.next()
-        if (next == null)
-        break
-        const {x, y} = next.value
+        if (next == null) break
+        const { x, y } = next.value
         const logits = model.apply(x)
         // Loss
         const loss = tf.losses.softmaxCrossEntropy(y, logits)
@@ -38,8 +33,8 @@ export default async function evaluate(tf: any, model: any, config: Config)
         x.dispose()
         y.dispose()
 
-        console.log(tf.memory());
-        iteration++;
+        console.log(tf.memory())
+        iteration++
     }
 
     const loss_tensor = await tf.tensor(losses).mean()
@@ -47,10 +42,10 @@ export default async function evaluate(tf: any, model: any, config: Config)
     const pp = 2.71828 ** loss
 
     loss_tensor.dispose()
-    
-    return {  
-        "val/loss": loss,
-        "val/perplexity": pp,
-        "val/acc": acc[0] / acc[1],
+
+    return {
+        'val/loss': loss,
+        'val/perplexity': pp,
+        'val/acc': acc[0] / acc[1],
     }
 }

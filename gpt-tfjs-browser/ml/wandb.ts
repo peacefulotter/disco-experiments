@@ -1,10 +1,16 @@
-import { Config } from "./types"
+import { Config } from '~/tfjs-types'
 
-
-export const init = async (save: any, config: Config, prefix: string, date: string) =>  {
+export const init = async (
+    save: any,
+    config: Config,
+    prefix: string,
+    date: string
+) => {
     const { files, ...rest } = config
     save.init = {
-        config: rest, prefix, date
+        config: rest,
+        prefix,
+        date,
     }
 
     // await fetch("/api/wandb/init", {
@@ -21,6 +27,7 @@ export const init = async (save: any, config: Config, prefix: string, date: stri
 }
 
 export const log = async (save: any, payload: any) => {
+    console.log(payload)
     save.logs.push(payload)
     // await fetch("/api/wandb/log", {
     //   method: "POST",
@@ -31,19 +38,19 @@ export const log = async (save: any, payload: any) => {
     // });
 }
 
-export const finish = async (save: any) => {
-    console.log(save);
-    
+export const finish = async (save: any, config: Config) => {
+    console.log(save)
+
     // await fetch("/api/wandb/finish", {
     //   method: "POST",
     // });
 
-    const res = await fetch("/api/save", {
-        method: "POST",
+    const res = await fetch('/api/save', {
+        method: 'POST',
         headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify(save),
-    });
-    console.log(res);
+        body: JSON.stringify({ save, config }),
+    })
+    console.log(res)
 }

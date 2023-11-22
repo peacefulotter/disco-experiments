@@ -2,6 +2,9 @@
 const { webpack } = require("next/dist/compiled/webpack/webpack");
 
 module.exports = {
+    experimental: {
+        externalDir: true,
+    },
     webpack: (config, { isServer }) => {
         if (!isServer) {
             config.resolve = {
