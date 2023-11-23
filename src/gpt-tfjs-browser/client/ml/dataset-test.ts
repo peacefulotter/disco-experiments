@@ -1,12 +1,12 @@
 'use client'
 import * as tf from '@tensorflow/tfjs'
-import { getFrontendDataset } from './dataset'
+import getDataset from './dataset'
 import config from '~/config'
 
 export default async function datasetTest() {
     await tf.ready()
 
-    let dataset = await getFrontendDataset(config, 'valid')
+    let { dataset, closeWS } = await getDataset(config, 'valid')
     dataset = dataset.batch(4)
 
     const iter = await dataset.iterator()
@@ -17,4 +17,6 @@ export default async function datasetTest() {
     console.log(await next.value.y.array())
     console.log(next.value.x.shape)
     console.log(next.value.y.shape)
+
+    closeWS()
 }

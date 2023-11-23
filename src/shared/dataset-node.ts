@@ -1,7 +1,12 @@
 import fs from 'fs'
 import { readdir } from 'fs/promises'
 import path from 'path'
-import { Config } from '../../shared/tfjs-types.js'
+import { Config } from './tfjs-types.js'
+
+// For ts-node-esm
+import { fileURLToPath } from 'url'
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 function getFileStream(config: Config, datasetDir: string, file: string) {
     // blockSize to get an initial full x
@@ -23,10 +28,9 @@ const getDatasetFile = async (datasetDir: string, split: string) => {
     return file
 }
 
-// call from server
 export async function getPreprocessedDataset(config: Config, split: string) {
     const { dataset } = config
-    const datasetDir = path.join(process.cwd(), '../../..', 'datasets', dataset)
+    const datasetDir = path.join(__dirname, '../../..', 'datasets', dataset)
     console.log('Preprocessed dataset located at:', datasetDir)
 
     const file = await getDatasetFile(datasetDir, split)

@@ -1,9 +1,9 @@
 import * as tf from '@tensorflow/tfjs'
 import { model } from 'gpt-tfjs'
-import { getFrontendDataset } from './dataset'
-import evaluate from './evaluate'
+import getDataset from './dataset'
 import * as wandb from './wandb'
 import setBackend, { BackendName } from './backend'
+import evaluate from '~/evaluate'
 import config from '~/config'
 
 const { GPTLMHeadModel } = model
@@ -12,7 +12,7 @@ export default async function main(prefix: string, backendName: BackendName) {
     await setBackend(backendName)
 
     const date = new Date().toISOString()
-    const dataset = await getFrontendDataset(config, 'train')
+    const { dataset, closeWS } = await getDataset(config, 'train')
 
     console.log(config)
 
@@ -25,8 +25,6 @@ export default async function main(prefix: string, backendName: BackendName) {
     const start = Date.now()
     let time = start
     const cb = async (model: any, loss: number, iter: number) => {
-        console.log(iter)
-
         const payload = {
             'train/loss': loss,
             iter,
@@ -36,8 +34,13 @@ export default async function main(prefix: string, backendName: BackendName) {
         }
 
         if (iter % config.evalFreq == 0) {
-            const eval_res = await evaluate(tf, model, config)
+            let { dataset: evalDataset, closeWS } = await getDataset(
+                config,
+                'valid'
+            )
+            const eval_res = await evaluate(tf, model, evalDataset, config)
             Object.assign(payload, eval_res)
+            closeWS()
             // TODO: eval like in llm-baselines with table
         }
 
@@ -52,4 +55,6 @@ export default async function main(prefix: string, backendName: BackendName) {
     })
 
     await wandb.finish(save, config, backendName)
+
+    closeWS()
 }

@@ -2,18 +2,23 @@
 
 import datasetTest from '@/ml/dataset-test'
 import inference from '@/ml/inference'
-// import Chart from "@/components/Chart";
-// import Combobox from "@/components/Combobox";
 import trainGPU from '@/ml/train-gpu'
 import wandbTest from '@/ml/wandb-test'
 import { ReactNode } from 'react'
 
+// import Chart from "@/components/Chart";
+// import Combobox from "@/components/Combobox";
 // const profiles = [
 //   {value: 'iter', text: 'Iteration'},
 //   {value: 'loss', text: 'Loss'},
 //   {value: 'time', text: 'Time'},
 //   {value: 'mem', text: 'Memory'}
 // ]
+//  <div className='flex gap-4'>
+//     <Combobox options={profiles} param={'x'} />
+//     <Combobox options={profiles} param={'y'} />
+// </div>
+// <Chart data={data.samples} />
 
 const Btn = ({ callback, name }: { callback: () => void; name: ReactNode }) => {
     return (
@@ -27,9 +32,6 @@ const Btn = ({ callback, name }: { callback: () => void; name: ReactNode }) => {
 }
 
 export default function Home() {
-    // const res = await fetch('http://localhost:5000/api/', { cache: 'no-cache' })
-    // const data = await res.json()
-
     return (
         <main className="grid grid-cols-2 grid-rows-3 p-12 gap-4">
             <Btn callback={() => trainGPU('webgpu')} name="Train webgpu" />
@@ -38,11 +40,6 @@ export default function Home() {
             <Btn callback={() => wandbTest()} name="Wandb test" />
             <Btn callback={() => inference('webgl')} name="Inference webgl" />
             <Btn callback={() => inference('webgpu')} name="Inference webgpu" />
-            {/* <div className='flex gap-4'>
-        <Combobox options={profiles} param={'x'} />
-        <Combobox options={profiles} param={'y'} />
-      </div>
-      <Chart data={data.samples} /> */}
         </main>
     )
 }

@@ -22,9 +22,15 @@
         "checkJs": false,
         "paths": {
             "@/*": ["./*"],
-            "~/*": ["../../*"] // doesn't work unfortunately
+            "~/*": ["../../shared/*"] // doesn't work unfortunately
         }
     },
-    "include": ["./**/*.ts", "./**/*.js", "../../*.ts", "../../*.js"],
+    "include": [
+        "../../shared/**/*.ts",
+        "./**/*.ts",
+        "./**/*.js",
+        "../../*.ts",
+        "../../*.js"
+    ],
     "exclude": ["./node_modules/**/*", "./dist/**/*"]
 }

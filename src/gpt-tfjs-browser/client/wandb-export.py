@@ -4,7 +4,7 @@ import json
 import wandb
 
 import sys
-sys.path.append(os.path.abspath('../..'))
+sys.path.append(os.path.abspath('../../shared/'))
 from config import config
 
 if len(sys.argv) < 2:
@@ -19,7 +19,6 @@ print('Loading file:', path)
 with open(path, 'r') as f:
     save = json.load(f)
 
-print(save.keys())
 init = save['init']
 config = init['config']
 wandb.init(config=config, project=config['wandbProject'], name=file_name)

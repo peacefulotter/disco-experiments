@@ -2,7 +2,7 @@
 # generated using: https://www.codeconvert.ai/typescript-to-python-converter
 # and entering the train-config.ts file
 
-modelType = 'gpt-nano'
+modelType = 'gpt-mini'
 dataset = 'wikitext'
 batchSize = 8
 seqLength = 128

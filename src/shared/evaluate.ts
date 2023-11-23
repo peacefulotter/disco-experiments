@@ -1,13 +1,17 @@
-import { Config } from '~/tfjs-types.js'
-import { getFrontendDataset } from './dataset'
+import { Config, EncodedDataset } from './tfjs-types.js'
 
-export default async function evaluate(tf: any, model: any, config: Config) {
-    let evalDataset = await getFrontendDataset(config, 'valid')
-    evalDataset = evalDataset.batch(config.batchSize)
+export default async function evaluate(
+    tf: any,
+    model: any,
+    dataset: EncodedDataset,
+    config: Config
+) {
     console.log('Evaluating..')
 
-    const iter = await evalDataset.iterator()
-    let losses = []
+    dataset = dataset.batch(config.batchSize)
+    const iter = await dataset.iterator()
+
+    let total_loss = 0
     const acc: [number, number] = [0, 0]
 
     let iteration = 0
@@ -16,10 +20,12 @@ export default async function evaluate(tf: any, model: any, config: Config) {
         if (next == null) break
         const { x, y } = next.value
         const logits = model.apply(x)
+
         // Loss
         const loss = tf.losses.softmaxCrossEntropy(y, logits)
         const lossVal = await loss.array()
-        losses.push(lossVal)
+        total_loss += lossVal
+
         // Accuracy
         const acc_tensor = tf.metrics.categoricalAccuracy(y, logits)
         const acc_sum = acc_tensor.sum()
@@ -33,15 +39,11 @@ export default async function evaluate(tf: any, model: any, config: Config) {
         x.dispose()
         y.dispose()
 
-        console.log(tf.memory())
         iteration++
     }
 
-    const loss_tensor = await tf.tensor(losses).mean()
-    const loss = await loss_tensor.array()
+    const loss = total_loss / iteration
     const pp = 2.71828 ** loss
-
-    loss_tensor.dispose()
 
     return {
         'val/loss': loss,

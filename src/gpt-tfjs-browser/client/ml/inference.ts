@@ -1,7 +1,7 @@
 import * as tf from '@tensorflow/tfjs'
 import { model } from 'gpt-tfjs'
 import config from '~/config'
-import { getFrontendDataset } from './dataset'
+import getDataset from './dataset'
 import setBackend, { BackendName } from './backend'
 const { GPTLMHeadModel } = model
 
@@ -64,7 +64,7 @@ function generateOnce(model: any, idx: any, config: any) {
 export default async function inference(backendName: BackendName) {
     await setBackend(backendName)
 
-    const dataset = await getFrontendDataset(config, 'valid')
+    const { dataset, closeWS } = await getDataset(config, 'valid')
     const gpt = GPTLMHeadModel(config)
 
     const maxNewTokens = 20
@@ -91,6 +91,8 @@ export default async function inference(backendName: BackendName) {
             await new Promise((r) => setTimeout(r, 1))
         }
     }
+
+    closeWS()
 
     console.log(
         'Avg: prediction time:',

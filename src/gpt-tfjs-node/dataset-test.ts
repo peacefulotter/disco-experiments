@@ -1,8 +1,8 @@
 import * as tf from '@tensorflow/tfjs-node'
-import { getPreprocessedDataset } from './dataset.js'
-import { config, datasetDir } from './config.js'
+import getDataset from './dataset.js'
+import config from '~/config.js'
 
-let dataset = await getPreprocessedDataset(tf, datasetDir, 'val', config)
+let dataset = await getDataset(config, 'valid')
 // TODO: dataset = dataset.batch(4)
 
 const iter = await dataset.iterator()
