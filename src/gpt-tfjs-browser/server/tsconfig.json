@@ -1,27 +1,30 @@
 {
+    "ts-node": {
+        "require": ["ts-node/register", "tsconfig-paths/register"]
+    },
     "compilerOptions": {
+        "baseUrl": "./",
+        "rootDirs": ["../../", "./"],
         "esModuleInterop": true,
         "moduleResolution": "nodenext",
         "module": "nodenext",
         "target": "esnext",
         "outDir": "./dist",
-        "strict": false, // can't set strict because of gpt-tfjs that has no declarations
+        "strict": true,
         "allowJs": true,
         "declaration": true,
         "emitDeclarationOnly": false,
         "skipLibCheck": true,
         "resolveJsonModule": true,
+        "noEmit": true,
+        "isolatedModules": true,
+        "incremental": true,
+        "checkJs": false,
         "paths": {
             "@/*": ["./*"],
-            "~/*": ["../*"]
+            "~/*": ["../../*"] // doesn't work unfortunately
         }
     },
-    "include": [
-        "./**/*.ts",
-        "./**/*.js",
-    ],
-    "exclude": [
-        "./node_modules/**/*",
-        "./dist/**/*"
-    ]
+    "include": ["./**/*.ts", "./**/*.js", "../../*.ts", "../../*.js"],
+    "exclude": ["./node_modules/**/*", "./dist/**/*"]
 }

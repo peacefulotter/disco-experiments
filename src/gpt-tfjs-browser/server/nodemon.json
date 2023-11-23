@@ -1,8 +1,8 @@
 {
-    "watch": ["**/*.ts"],
+    "watch": ["**/*.ts", "../../*.ts"],
     "ext": "ts",
     "execMap": {
-        "ts": "node --loader ts-node/esm -r tsconfig-paths/register"
+        "ts": "node --loader ts-node/esm -r tsconfig-paths/register -r ts-node/register "
     },
     "ignore": []
 }

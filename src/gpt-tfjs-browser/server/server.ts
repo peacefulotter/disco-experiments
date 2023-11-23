@@ -1,3 +1,4 @@
+import 'module-alias/register.js'
 import express from 'express'
 import * as http from 'http'
 import initWebsockets from './socket.js'
