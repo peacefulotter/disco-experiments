@@ -1,5 +1,4 @@
-import { getPreprocessedDataset } from './dataset'
-import getConfig from './config'
+import config from '~/config'
 import wandb from '@wandb/sdk'
 
 const log = async (v: number) => {

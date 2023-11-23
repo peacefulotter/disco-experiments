@@ -1,7 +1,7 @@
 import { WebSocketServer } from 'ws'
 import { Server } from './types.js'
 import { getPreprocessedDataset } from './dataset.js'
-import config from '../../train-config.js'
+import config from '../../config.js'
 import { IncomingMessage } from 'http'
 
 const dummyUrl = 'http://localhost:3001' // can be anything as long as it's a valid URL

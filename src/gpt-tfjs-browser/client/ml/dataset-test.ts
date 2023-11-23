@@ -1,12 +1,11 @@
 'use client'
 import * as tf from '@tensorflow/tfjs'
 import { getFrontendDataset } from './dataset'
-import getConfig from './config'
+import config from '~/config'
 
 export default async function datasetTest() {
     await tf.ready()
 
-    const config = await getConfig()
     let dataset = await getFrontendDataset(config, 'valid')
     dataset = dataset.batch(4)
 

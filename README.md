@@ -23,10 +23,13 @@ $ npm install
 $ npm run dev
 # The following is optional and are destined to people who have chrome
 $ google-chrome --enable-unsafe-webgpu --enable-features=Vulkan,UseSkiaRenderer # Run chrome with WebGPU enabled
+# Or from the project root directory
+$ ./chrome-webgpu.sh & # same command as above + run in detach mode
 ```
 
-Go to `localhost:3000` on a browser supporting webgpu (not firefox as of writing this to the best of my knowledge).
-**Important**: Check if your browser supports webgpu: go to `chrome://gpu` and there should be a flag under "Graphics Feature Status" called "WebGPU". Make sure it is **not** set to Disabled
+1. **Important**: Check if your browser supports webgpu, firefox does not as of writing this to the best of my knowledge. Go to `chrome://gpu` and there should be a flag under "Graphics Feature Status" called "WebGPU". Make sure it is **not** set to Disabled.
+
+2. Navigate to `localhost:3000` on your browser.
 
 ### tfjs-node
 

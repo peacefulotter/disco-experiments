@@ -1,157 +1,98 @@
-import fs from "fs";
-import path from "path";
-import { readdir } from "fs/promises";
-import { encode } from "gpt-tokenizer/model/text-davinci-003";
+import * as tf from '@tensorflow/tfjs'
+import fs from 'fs'
+import { readdir } from 'fs/promises'
+import path from 'path'
 import {
-  Dataset,
-  DatasetConfig,
-  EncodedDataset,
-} from "./types.js";
+    AsyncTokenizedGenerator,
+    Config,
+    EncodedDataset,
+    TokenizedSample,
+} from '~/tfjs-types.js'
 
-// For ts-node-esm
-import { fileURLToPath } from "url";
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+function getFileStream(config: Config, datasetDir: string, file: string) {
+    // blockSize to get an initial full x
+    // + batchSize to retrieve a batch from it (each element of the batch is a shift by << n for the nth elt in batch)
+    // + 1 for the last y of the batch
+    const highWaterMark = (config.blockSize + config.batchSize + 1) * 2
+    console.log('HighWaterMark:', highWaterMark)
 
-type TokenizedGenerator = () => AsyncGenerator<
-  {
-    x: number[];
-    y: number[];
-  },
-  void,
-  unknown
->;
+    return fs.createReadStream(path.join(datasetDir, file), {
+        highWaterMark, // set this to seq length * 2 because we store uint16,
+    })
+}
+
+const getDatasetFile = async (datasetDir: string, split: string) => {
+    const files = await readdir(datasetDir)
+    const file = files.filter((f) => f.includes(split))[0]
+    console.log('Found', files.length, 'files in dataset under', datasetDir)
+    console.log('File corresponding to split', split, 'is', file)
+    return file
+}
+
+export async function getPreprocessedDataset(config: Config, split: string) {
+    const { dataset } = config
+    const datasetDir = path.join(process.cwd(), '../../..', 'datasets', dataset)
+    console.log('Preprocessed dataset located at:', datasetDir)
+
+    const file = await getDatasetFile(datasetDir, split)
+    const stream = getFileStream(config, datasetDir, file)
+    return stream.iterator()
+}
 
 async function sleep(t: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, t);
-  });
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve()
+        }, t)
+    })
 }
 
-export async function getDataset(tf: any, dir: string, config: DatasetConfig) {
-  const getStreams = await getFileStreams(dir, config);
-  async function* dataGenerator() {
-    const streams = getStreams();
-    for await (const stream of streams) {
-      for await (const chunk of stream) {
-        const text = chunk.toString();
-        yield { text };
-        await sleep(1);
-      }
+const tokenizedIterator = (
+    gen: () => AsyncTokenizedGenerator,
+    vocabSize: number
+): EncodedDataset => {
+    return tf.data.generator(gen as any).map((v: any & TokenizedSample) => ({
+        x: tf.tensor1d(v.x, 'int32'),
+        y: tf.oneHot(v.y, vocabSize),
+    }))
+}
+
+const toUInt16 = (low: number, high: number) => {
+    low &= 0xff
+    high &= 0xff
+    return (high << 8) | low
+}
+
+export async function getFrontendDataset(config: Config, split: string) {
+    const { vocabSize } = config
+
+    const requestNext = async () => {
+        const stream = await getPreprocessedDataset(config, split)
+        const next = await stream.next()
+        return next.value
     }
-  }
-  return tf.data.generator(dataGenerator as any) as Dataset;
-}
 
-const tokenizedGenerator = (
-  tf: any,
-  generator: TokenizedGenerator,
-  vocabSize: number
-) => {
-  return tf.data
-    .generator(generator as any)
-    .map((v: { x: number[]; y: number[] }) => ({
-      x: tf.tensor1d(v.x, "int32"),
-      y: tf.oneHot(v.y, vocabSize),
-    })) as EncodedDataset;
-};
+    async function* generator(): AsyncTokenizedGenerator {
+        while (true) {
+            const chunk = await requestNext()
+            if (!chunk) break
 
-export async function getPreprocessedDataset(
-  tf: any,
-  dir: string,
-  split: string,
-  config: DatasetConfig
-) {
-  const { vocabSize } = config;
-  const split_dir = path.join(dir, split)
-  const filesContentGetter = await getFilesContent(split_dir);
+            const tokens = []
+            for (let i = 0; i < chunk.length; i += 2) {
+                const low = chunk[i]
+                const high = chunk[i + 1]
+                const token = toUInt16(low, high)
+                tokens.push(token)
+            }
 
-  const generator: TokenizedGenerator = async function* () {
-    const files = filesContentGetter();
-    for await (const file of files) {
-      const tensors = JSON.parse(file);
-      for (const tokens of tensors) {
-        const x = tokens.slice(0, -1);
-        const y = tokens.slice(1);
-        yield { x, y };
-        await sleep(1);
-      }
-    }
-  };
-  return tokenizedGenerator(tf, generator, vocabSize);
-}
-
-export async function getEncodedDataset(
-  tf: any,
-  dir: string,
-  config: DatasetConfig
-) {
-  const { blockSize, vocabSize, verbose } = config;
-  const getStreams = await getFileStreams(dir, config);
-
-  const generator: TokenizedGenerator = async function* () {
-    const streams = getStreams();
-    if (verbose) console.log("Starting data generator");
-    for await (const stream of streams) {
-      for await (const chunk of stream) {
-        const text = chunk.toString();
-        const tokens = encode(text);
-        if (verbose)
-          console.log(
-            `Stream chunk: ${text.slice(0, 40)}... (${tokens.length} tokens)`
-          );
-
-        if (blockSize >= tokens.length) {
-          const x = tokens.slice(0, blockSize);
-          const y = tokens.slice(1, blockSize + 1);
-          x.push(...new Array(blockSize - x.length).fill(vocabSize - 1));
-          y.push(...new Array(blockSize - y.length).fill(vocabSize - 1));
-          yield { x, y };
+            for (let i = 0; i < config.batchSize; i++) {
+                const x = tokens.slice(i, i + config.blockSize)
+                const y = tokens.slice(i + 1, i + config.blockSize + 1)
+                yield { x, y }
+                await sleep(1)
+            }
         }
-
-        for (let i = 0; i < tokens.length - blockSize - 1; i += blockSize) {
-          const x = tokens.slice(i, i + blockSize);
-          const y = tokens.slice(i + 1, i + blockSize + 1);
-          yield { x, y };
-          await sleep(1);
-        }
-
-        await sleep(1);
-      }
     }
-  };
-  return tokenizedGenerator(tf, generator, vocabSize);
-}
 
-const getFilesInDir = async (dir: string): Promise<[string, string[]]> => {
-  const dirPath = path.join(__dirname, "datasets/", dir);
-  const files = await readdir(dirPath);
-  console.log("Found", files.length, "files in dataset");
-  return [dirPath, files];
-};
-
-async function getFileStreams(dir: string, config: DatasetConfig) {
-  const [dirPath, files] = await getFilesInDir(dir);
-  console.log("Found", files.length, "files in dataset");
-  const getStreams = () =>
-    files.map((file) =>
-      fs.createReadStream(path.join(dirPath, file), {
-        encoding: "utf8",
-        highWaterMark: config.blockSize,
-      })
-    );
-  return getStreams;
-}
-
-async function getFilesContent(dir: string) {
-  const [dirPath, files] = await getFilesInDir(dir);
-  return () =>
-    files.map(
-      async (file) =>
-        await fs.promises.readFile(path.join(dirPath, file), {
-          encoding: "utf8",
-        })
-    );
+    return tokenizedIterator(generator, vocabSize)
 }

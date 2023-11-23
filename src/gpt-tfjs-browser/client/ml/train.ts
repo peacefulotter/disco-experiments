@@ -4,7 +4,7 @@ import { getFrontendDataset } from './dataset'
 import evaluate from './evaluate'
 import * as wandb from './wandb'
 import setBackend, { BackendName } from './backend'
-import getConfig from './config'
+import config from '~/config'
 
 const { GPTLMHeadModel } = model
 
@@ -12,7 +12,6 @@ export default async function main(prefix: string, backendName: BackendName) {
     await setBackend(backendName)
 
     const date = new Date().toISOString()
-    const config = await getConfig()
     const dataset = await getFrontendDataset(config, 'train')
 
     console.log(config)
@@ -52,5 +51,5 @@ export default async function main(prefix: string, backendName: BackendName) {
         callbacks: [cb],
     })
 
-    await wandb.finish(save, config)
+    await wandb.finish(save, config, backendName)
 }

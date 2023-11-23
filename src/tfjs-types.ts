@@ -1,5 +1,5 @@
 import * as tf from '@tensorflow/tfjs'
-import config from './train-config.js'
+import config from './config.js'
 
 export type Models = 'gpt-nano' | 'gpt-micro' | 'gpt-mini' //, 'gpt2', 'gpt2-medium', 'gpt2-large', 'gpt2-xl']
 

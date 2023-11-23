@@ -1,4 +1,5 @@
 import { Config } from '~/tfjs-types'
+import { BackendName } from './backend'
 
 export const init = async (
     save: any,
@@ -37,7 +38,11 @@ export const log = async (save: any, payload: any) => {
     // });
 }
 
-export const finish = async (save: any, config: Config) => {
+export const finish = async (
+    save: any,
+    config: Config,
+    backendName: BackendName
+) => {
     console.log(save)
 
     // await fetch("/api/wandb/finish", {
@@ -49,7 +54,7 @@ export const finish = async (save: any, config: Config) => {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ save, config }),
+        body: JSON.stringify({ save, config, backendName }),
     })
     console.log(res)
 }
