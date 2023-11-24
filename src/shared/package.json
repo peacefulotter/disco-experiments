@@ -15,6 +15,7 @@
     },
     "dependencies": {
         "@tensorflow/tfjs-node": "^4.13.0",
+        "gpt-tfjs": "^0.0.5",
         "gpt-tokenizer": "^2.1.2"
     }
 }

@@ -1,8 +1,8 @@
-import * as tf from '@tensorflow/tfjs-node-gpu'
+import * as tf from '@tensorflow/tfjs'
 import { model } from 'gpt-tfjs'
-import config from '~/config.js'
-import getDataset from './dataset.js'
-
+import config from './config.js'
+import { BackendName, EncodedDataset } from './tfjs-types.js'
+import setBackend from './backend.js'
 const { GPTLMHeadModel } = model
 
 function prepareIdx(idx: any) {
@@ -61,14 +61,18 @@ function generateOnce(model: any, idx: any, config: any) {
     }
 }
 
-async function main() {
-    tf.setBackend('tensorflow')
+export default async function inference(
+    tf: any,
+    dataset: EncodedDataset,
+    backendName: BackendName
+) {
+    await setBackend(backendName)
 
-    const dataset = await getDataset(config, 'valid')
     const gpt = GPTLMHeadModel(config)
 
     const maxNewTokens = 20
     const params = { maxLength: 32, temperature: 1, ...config }
+    let stats: [number, number, number] = [0, 0, 0]
 
     const iter = await dataset.iterator()
     for (let i = 0; i < 8; i++) {
@@ -84,9 +88,17 @@ async function main() {
             console.log(
                 `prediction time: ${timePrediction}, time per token: ${timePerToken}`
             )
+            stats[0] += timePrediction
+            stats[1] += timePerToken
+            stats[2] += 1
             await new Promise((r) => setTimeout(r, 1))
         }
     }
-}
 
-await main()
+    console.log(
+        'Avg: prediction time:',
+        stats[0] / stats[2],
+        ', time per token:',
+        stats[1] / stats[2]
+    )
+}

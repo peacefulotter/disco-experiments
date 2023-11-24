@@ -2,7 +2,7 @@ import * as tf from '@tensorflow/tfjs'
 import { model } from 'gpt-tfjs'
 import getDataset from './dataset'
 import * as wandb from './wandb'
-import setBackend, { BackendName } from './backend'
+import setBackend, { BackendName } from '../../../shared/backend'
 import evaluate from '~/evaluate'
 import config from '~/config'
 

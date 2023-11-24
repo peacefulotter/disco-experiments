@@ -1,7 +1,7 @@
 'use client'
 
 import datasetTest from '@/ml/dataset-test'
-import inference from '@/ml/inference'
+import inferenceTest from '@/ml/inference-test'
 import trainGPU from '@/ml/train-gpu'
 import wandbTest from '@/ml/wandb-test'
 import { ReactNode } from 'react'
@@ -38,8 +38,14 @@ export default function Home() {
             <Btn callback={() => trainGPU('webgl')} name="train webgl" />
             <Btn callback={() => datasetTest()} name="Dataset test" />
             <Btn callback={() => wandbTest()} name="Wandb test" />
-            <Btn callback={() => inference('webgl')} name="Inference webgl" />
-            <Btn callback={() => inference('webgpu')} name="Inference webgpu" />
+            <Btn
+                callback={() => inferenceTest('webgl')}
+                name="Inference webgl"
+            />
+            <Btn
+                callback={() => inferenceTest('webgpu')}
+                name="Inference webgpu"
+            />
         </main>
     )
 }

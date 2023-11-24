@@ -1,7 +1,6 @@
 import * as tf from '@tensorflow/tfjs-core'
 import '@tensorflow/tfjs-backend-webgpu'
-
-export type BackendName = 'cpu' | 'webgl' | 'webgpu'
+import { BackendName } from './tfjs-types.js'
 
 export default async function setBackend(backendName: BackendName) {
     console.log(

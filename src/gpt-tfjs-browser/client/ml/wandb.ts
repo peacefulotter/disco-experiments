@@ -1,5 +1,5 @@
 import { Config } from '~/tfjs-types'
-import { BackendName } from './backend'
+import { BackendName } from '../../../shared/backend'
 
 export const init = async (
     save: any,
