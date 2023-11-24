@@ -1,7 +1,9 @@
+import * as tf from '@tensorflow/tfjs-node'
 import fs from 'fs'
 import { readdir } from 'fs/promises'
 import path from 'path'
-import { Config, TokenizedSample } from './tfjs-types'
+import { getDataset as getBackboneDataset } from './dataset'
+import { Config } from './tfjs-types'
 
 // For ts-node-esm
 import { fileURLToPath } from 'url'
@@ -69,4 +71,14 @@ export function getIteratorDatasetFromFile(
             return sample
         },
     }
+}
+
+export async function getDataset(config: Config, split: string) {
+    const file = await getDatasetFile(config, split)
+    let stream = getIteratorDatasetFromFile(config, file)
+    const requestNext = async () => {
+        const { value } = await stream.next()
+        return value
+    }
+    return getBackboneDataset(tf, config, requestNext)
 }

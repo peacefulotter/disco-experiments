@@ -5,7 +5,7 @@
         "module": "ESNext",
         "target": "esnext",
         "outDir": "./dist",
-        "strict": true,
+        "strict": false,
         "allowJs": true,
         "declaration": true,
         "emitDeclarationOnly": false,

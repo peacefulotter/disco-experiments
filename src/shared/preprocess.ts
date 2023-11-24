@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import esMain from 'es-main'
 import { readdir } from 'fs/promises'
 import { encode } from 'gpt-tokenizer/model/text-davinci-003'
 
@@ -23,11 +24,12 @@ async function getFileStreams(datasetDir: string) {
     return streams
 }
 
-const datasetDir = path.join(__dirname, 'datasets', 'wikitext')
-console.log('Preprocessing step located at:', datasetDir)
-const streams = await getFileStreams(datasetDir)
-
-const preprocess = async (file: string, stream: fs.ReadStream) =>
+const preprocessStream = async (
+    datasetDir: string,
+    file: string,
+    stream: fs.ReadStream,
+    cb?: (tokens: number[]) => void
+) =>
     new Promise((resolve) => {
         const writeFilePath = path.join(datasetDir, file + '.pp')
         console.log('Writing to', writeFilePath)
@@ -35,6 +37,7 @@ const preprocess = async (file: string, stream: fs.ReadStream) =>
         stream
             .map((chunk) => {
                 const tokens = encode(chunk.toString())
+                cb?.(tokens)
                 const array = new Uint16Array(tokens)
                 const buffer = Buffer.from(array.buffer)
                 return buffer
@@ -47,6 +50,17 @@ const preprocess = async (file: string, stream: fs.ReadStream) =>
         })
     })
 
-for await (const { file, stream } of streams) {
-    await preprocess(file, stream)
+export default async function preprocess(cb?: (tokens: number[]) => void) {
+    const datasetDir = path.join(__dirname, '../..', 'datasets', 'wikitext')
+    console.log('Preprocessing step located at:', datasetDir)
+    const streams = await getFileStreams(datasetDir)
+
+    for await (const { file, stream } of streams) {
+        if (!file.includes('valid')) continue
+        await preprocessStream(datasetDir, file, stream, cb)
+    }
+}
+
+if (esMain(import.meta)) {
+    await preprocess()
 }
