@@ -1,12 +1,8 @@
 import { Config } from '~/tfjs-types'
-import { BackendName } from '../../../shared/backend'
+import { BackendName } from '../../../shared/tfjs-types'
 
-export const init = async (
-    save: any,
-    config: Config,
-    prefix: string,
-    date: string
-) => {
+export const init = async (save: any, config: Config, prefix: string) => {
+    const date = new Date().toISOString()
     save.init = {
         config,
         prefix,

@@ -1,5 +1,5 @@
 import * as tf from '@tensorflow/tfjs'
-import config, { configModels } from './config.js'
+import config, { configModels } from './config'
 
 export type BackendName = 'cpu' | 'webgl' | 'webgpu' | 'tensorflow'
 
@@ -25,4 +25,30 @@ export type Callback = (
     iter: number
 ) => Promise<void> | void
 
-export type Config = typeof config
+export type Config = {
+    debug: boolean
+    verbose: boolean
+    modelType: Models
+    nLayer: number
+    nHead: number
+    nEmbd: number
+    dataset: string
+    batchSize: number
+    blockSize: number
+    lr: number
+    maxIter: number
+    shuffle: boolean | string
+    weightDecay: boolean
+    weight_decay: number
+    optimizer: string
+    gradClip: number
+    scheduler: string | null
+    dropout: number
+    numWorkers: number
+    vocabSize: number
+    wandbProject: string
+    evalFreq: number
+    evalSeqPrefix: string
+    maxEvalBatches: number
+    wandbName: string
+}

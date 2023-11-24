@@ -16,8 +16,9 @@ from optim.base import train_base
 from optim.sparse import train_sparse
 import distributed
 
-
-
+print(os.path.abspath('../../'))
+sys.path.append(os.path.abspath('../../'))
+from shared.config import config as train_config
 
 def get_args():
     parser = argparse.ArgumentParser(allow_abbrev=False)
@@ -40,30 +41,27 @@ def get_args():
 
 
 def main(args): 
-    with open('../../config.json') as f:
-        configs = json.load(f)
-
-    args.lr = configs['lr']
-    args.opt = configs['optimizer']
-    args.n_head = configs['nHead']
-    args.n_embd = configs['nEmbd']
-    args.n_layer = configs['nLayer']
-    args.dropout = configs['dropout']
-    args.dataset = configs['dataset']
-    args.scheduler = configs['scheduler'] if configs['scheduler'] != None else 'none'
-    args.max_iters = configs['maxIter']
-    args.batch_size = configs['batchSize']
-    args.iterations = configs['maxIter']
-    args.weight_decay = configs['weightDecay']
-    args.wandb_project = configs['wandbProject']
-    args.sequence_length = configs['blockSize']
-    args.eval_freq = configs['evalFreq']
-    args.eval_seq_prefix = configs['evalSeqPrefix']
+    args.lr = train_config['lr']
+    args.opt = train_config['optimizer']
+    args.n_head = train_config['nHead']
+    args.n_embd = train_config['nEmbd']
+    args.n_layer = train_config['nLayer']
+    args.dropout = train_config['dropout']
+    args.dataset = train_config['dataset']
+    args.scheduler = train_config['scheduler'] if train_config['scheduler'] != None else 'none'
+    args.max_iters = train_config['maxIter']
+    args.batch_size = train_config['batchSize']
+    args.iterations = train_config['maxIter']
+    args.weight_decay = train_config['weightDecay']
+    args.wandb_project = train_config['wandbProject']
+    args.sequence_length = train_config['blockSize']
+    args.eval_freq = train_config['evalFreq']
+    args.eval_seq_prefix = train_config['evalSeqPrefix']
 
     args.acc_steps = 1
     args.wandb = True
 
-    exp_name = 'llm-baseline_cpu_' + configs['wandbName']
+    exp_name = 'llm-baseline_' + config.device + '_' + train_config['wandbName']
 
 
     torch.backends.cuda.matmul.allow_tf32 = True # allows us to make sure we're able to use tensorfloat32 during training

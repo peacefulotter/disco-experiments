@@ -1,39 +1,72 @@
 import fs from 'fs'
 import { readdir } from 'fs/promises'
 import path from 'path'
-import { Config } from './tfjs-types.js'
+import { Config, TokenizedSample } from './tfjs-types'
 
 // For ts-node-esm
 import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-function getFileStream(config: Config, datasetDir: string, file: string) {
+function getFileStream(config: Config, file: string) {
+    const datasetDir = getDatasetDir(config)
+
     // blockSize to get an initial full x
     // + batchSize to retrieve a batch from it (each element of the batch is a shift by << n for the nth elt in batch)
     // + 1 for the last y of the batch
-    const highWaterMark = (config.blockSize + config.batchSize + 1) * 2
-    console.log('HighWaterMark:', highWaterMark)
+    // * 2 because we store the tokens into 2 bytes (16 bites uint)
+    // TODO: sure about this?
+    const highWaterMark = (config.blockSize + 1) * config.batchSize * 2 // (config.blockSize + config.batchSize + 1) * 2
+    console.log('highWaterMark', highWaterMark)
 
     return fs.createReadStream(path.join(datasetDir, file), {
         highWaterMark, // set this to seq length * 2 because we store uint16,
     })
 }
 
-const getDatasetFile = async (datasetDir: string, split: string) => {
+const getDatasetDir = (config: Config) =>
+    path.join(__dirname, '../../', 'datasets', config.dataset)
+
+export async function getDatasetFile(config: Config, split: string) {
+    const datasetDir = getDatasetDir(config)
+    console.log('Preprocessed dataset located at:', datasetDir)
+
     const files = await readdir(datasetDir)
-    const file = files.filter((f) => f.includes(split))[0]
-    console.log('Found', files.length, 'files in dataset under', datasetDir)
-    console.log('File corresponding to split', split, 'is', file)
+    const file = files.filter((f) => f.endsWith('pp') && f.includes(split))[0]
+    console.log(
+        'Found',
+        files.length,
+        'files in dataset, selected',
+        file,
+        'under',
+        datasetDir
+    )
     return file
 }
 
-export async function getPreprocessedDataset(config: Config, split: string) {
-    const { dataset } = config
-    const datasetDir = path.join(__dirname, '../../..', 'datasets', dataset)
-    console.log('Preprocessed dataset located at:', datasetDir)
-
-    const file = await getDatasetFile(datasetDir, split)
-    const stream = getFileStream(config, datasetDir, file)
-    return stream.iterator()
+export function getIteratorDatasetFromFile(
+    config: Config,
+    file: string
+): AsyncIterator<Buffer> {
+    const getStream = () => {
+        const stream = getFileStream(config, file)
+        return {
+            stream,
+            iter: stream.iterator() as AsyncIterableIterator<Buffer>,
+        }
+    }
+    let { stream, iter } = getStream()
+    return {
+        next: async () => {
+            let sample = await iter.next()
+            if (sample.done) {
+                stream.close()
+                const newStream = getStream()
+                stream = newStream.stream
+                iter = newStream.iter
+                sample = await iter.next()
+            }
+            return sample
+        },
+    }
 }

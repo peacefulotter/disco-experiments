@@ -1,4 +1,4 @@
-import { Models as Model } from './tfjs-types.js'
+import { Config, Models as Model } from './tfjs-types'
 
 export const configModels = {
     gpt2: {
@@ -34,7 +34,7 @@ export const configModels = {
     'gpt-nano': { nLayer: 3, nHead: 3, nEmbd: 48 },
 } as const
 
-const modelType: Model = 'gpt-mini'
+const modelType: Model = 'gpt-nano'
 const model = configModels[modelType]
 const dataset = 'wikitext'
 const batchSize = 8
@@ -61,7 +61,7 @@ const baseConfig = {
     gradClip: 1,
     scheduler: null,
     dropout: 0,
-    numWorkers: 4,
+    numWorkers: 0,
     vocabSize: 50257,
 
     wandbProject: 'disco-gpt-benchmark',
@@ -71,7 +71,7 @@ const baseConfig = {
     maxEvalBatches: 24,
 } as const
 
-const config = {
+const config: Config = {
     ...baseConfig,
     wandbName: `${modelType}_${dataset}_bs=${batchSize}_seq=${blockSize}_lr=${lr}_iter=${maxIter}`,
 } as const

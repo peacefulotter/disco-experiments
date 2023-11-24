@@ -1,8 +1,10 @@
 import * as tf from '@tensorflow/tfjs-node-gpu'
 import '@tensorflow/tfjs-backend-webgl'
-import main from './train.js'
+import train from './train.js'
+import setBackend from '../shared/backend.js'
 
-console.log(tf.engine().backendNames())
-await tf.setBackend('tensorflow')
-console.log(tf.getBackend())
-await main(tf, 'node-gpu')
+async function main() {
+    await setBackend('tensorflow')
+    await train(tf, 'node-gpu')
+}
+main()

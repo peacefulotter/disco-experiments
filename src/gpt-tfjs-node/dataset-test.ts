@@ -1,16 +1,32 @@
 import * as tf from '@tensorflow/tfjs-node'
 import getDataset from './dataset.js'
-import config from '~/config.js'
+import config from '../shared/config.js'
 
-let dataset = await getDataset(config, 'valid')
-// TODO: dataset = dataset.batch(4)
+async function main() {
+    const testConfig = { ...config, batchSize: 8, blockSize: 128 }
+    let dataset = await getDataset(testConfig, 'valid')
+    dataset = dataset.batch(testConfig.batchSize)
+    const iter = await dataset.iterator()
 
-const iter = await dataset.iterator()
-let i = 0
-while (i++ < 3) {
-    const { value } = await iter.next()
-    const { x, y } = value
-    console.log(i, x, y)
-    tf.dispose([x, y])
+    performance.mark('iter-start')
+    const iterations = 300
+    for (let i = 0; i < iterations; i++) {
+        const t0 = performance.now()
+        const { value } = await iter.next()
+        const t1 = performance.now()
+        // console.log(t1 - t0, 'milliseconds')
+        const { x, y } = value
+
+        // const max = tf.argMax(y, 2)
+        // console.log(i, x.shape, y.shape, max.shape)
+        // console.log(await x.array())
+        // console.log(await max.array())
+        // max.dispose()
+
+        tf.dispose([x, y])
+    }
+    performance.mark('iter-end')
+    const measure = performance.measure('iter', 'iter-start', 'iter-end')
+    console.log('average:', measure.duration / iterations)
 }
-console.log('after')
+main()

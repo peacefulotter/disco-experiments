@@ -1,23 +1,25 @@
 import * as tf from '@tensorflow/tfjs'
+import '@tensorflow/tfjs-backend-webgpu'
+
 import { model } from 'gpt-tfjs'
 import getDataset from './dataset'
 import * as wandb from './wandb'
-import setBackend, { BackendName } from '../../../shared/backend'
+import setBackend from '~/backend'
 import evaluate from '~/evaluate'
 import config from '~/config'
+import { BackendName } from '~/tfjs-types'
 
 const { GPTLMHeadModel } = model
 
 export default async function main(prefix: string, backendName: BackendName) {
     await setBackend(backendName)
 
-    const date = new Date().toISOString()
     const { dataset, closeWS } = await getDataset(config, 'train')
 
     console.log(config)
 
     const save: any = { init: undefined, logs: [] }
-    await wandb.init(save, config, prefix + '_' + backendName, date)
+    await wandb.init(save, config, prefix + '_' + backendName)
 
     console.log('Running', config.modelType)
     const gpt = GPTLMHeadModel(config)
@@ -34,7 +36,7 @@ export default async function main(prefix: string, backendName: BackendName) {
         }
 
         if (iter % config.evalFreq == 0) {
-            let { dataset: evalDataset, closeWS } = await getDataset(
+            const { dataset: evalDataset, closeWS } = await getDataset(
                 config,
                 'valid'
             )
@@ -50,7 +52,6 @@ export default async function main(prefix: string, backendName: BackendName) {
 
     await gpt.train(dataset, {
         ...config,
-        shuffle: 'batch',
         callbacks: [cb],
     })
 

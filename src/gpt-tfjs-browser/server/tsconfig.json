@@ -4,10 +4,9 @@
     },
     "compilerOptions": {
         "baseUrl": "./",
-        "rootDirs": ["../../", "./"],
         "esModuleInterop": true,
-        "moduleResolution": "nodenext",
-        "module": "nodenext",
+        "moduleResolution": "Bundler",
+        "module": "ESNext",
         "target": "esnext",
         "outDir": "./dist",
         "strict": true,

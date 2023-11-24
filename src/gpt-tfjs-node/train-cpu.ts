@@ -1,4 +1,9 @@
 import * as tf from '@tensorflow/tfjs-node'
-import main from './train.js'
+import train from './train.js'
+import setBackend from '../shared/backend.js'
 
-await main(tf, 'node-cpu')
+async function main() {
+    await setBackend('cpu')
+    await train(tf, 'node-cpu')
+}
+main()

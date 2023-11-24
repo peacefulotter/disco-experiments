@@ -1,6 +1,9 @@
 import { WebSocketServer } from 'ws'
-import { Server } from './types.js'
-import { getPreprocessedDataset } from './dataset.js'
+import { Server } from './types'
+import {
+    getDatasetFile,
+    getIteratorDatasetFromFile,
+} from '../../shared/dataset-node.js'
 import config from '../../shared/config.js'
 import { IncomingMessage } from 'http'
 
@@ -20,7 +23,8 @@ const initWebsockets = async (server: Server) => {
         console.log('Connection with client established')
 
         const split = getSplit(req)
-        const dataset = await getPreprocessedDataset(config, split)
+        const file = await getDatasetFile(config, split)
+        const dataset = getIteratorDatasetFromFile(config, file)
 
         ws.on('message', async (data) => {
             const { value } = await dataset.next()

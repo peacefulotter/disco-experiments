@@ -1,23 +1,21 @@
 import wandb from '@wandb/sdk'
 import { model } from 'gpt-tfjs'
 import getDataset from './dataset.js'
-import config from '~/config.js'
-import evaluate from '~/evaluate.js'
+import config from '../shared/config.js'
+import evaluate from '../shared/evaluate.js'
 const { GPTLMHeadModel } = model
 
 // TODO: move train to shared, once wandb is fixed?
 
-export default async function main(tf: any, prefix: string) {
+export default async function train(tf: any, prefix: string) {
     const date = new Date().toISOString()
     const trainDataset = await getDataset(config, 'train')
-    let evalDataset = await getDataset(config, 'valid')
-    evalDataset = evalDataset.batch(config.batchSize)
 
     console.log(config, prefix)
 
     await wandb.init({
         project: config.wandbProject,
-        name: `node_${prefix}_${config.wandbName}`,
+        name: `${prefix}_${config.wandbName}`,
         config: { ...config, date },
     })
 
@@ -36,10 +34,13 @@ export default async function main(tf: any, prefix: string) {
         }
 
         if (iter % config.evalFreq == 0) {
+            const evalDataset = await getDataset(config, 'valid')
             const eval_res = await evaluate(tf, model, evalDataset, config)
             Object.assign(payload, eval_res)
             // TODO: eval like in llm-baselines with table
         }
+
+        console.log(payload)
 
         wandb.log(payload)
         time = Date.now()

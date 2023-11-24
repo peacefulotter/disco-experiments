@@ -3,7 +3,7 @@ import {
     AsyncTokenizedGenerator,
     EncodedDataset,
     TokenizedSample,
-} from '../shared/tfjs-types.js'
+} from '../shared/tfjs-types'
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -30,25 +30,40 @@ export async function getDataset(
     requestNext: () => Promise<number[]>
 ) {
     const { vocabSize } = config
+    const sampleSize = config.blockSize + 1
 
     async function* generator(): AsyncTokenizedGenerator {
         while (true) {
             const chunk = await requestNext()
             if (!chunk) break
 
-            const tokens = []
-            for (let i = 0; i < chunk.length; i += 2) {
-                const low = chunk[i]
-                const high = chunk[i + 1]
-                const token = toUInt16(low, high)
-                tokens.push(token)
-            }
+            // const tokens = []
+            // for (let i = 0; i < chunk.length; i += 2) {
+            //     const low = chunk[i]
+            //     const high = chunk[i + 1]
+            //     const token = toUInt16(low, high)
+            //     tokens.push(token)
+            // }
+
+            // for (let i = 0; i < config.batchSize; i++) {
+            //     const x = tokens.slice(i, i + config.blockSize)
+            //     const y = tokens.slice(i + 1, i + config.blockSize + 1)
+            //     yield { x, y }
+            //     // await sleep(1)
+            // }
 
             for (let i = 0; i < config.batchSize; i++) {
-                const x = tokens.slice(i, i + config.blockSize)
-                const y = tokens.slice(i + 1, i + config.blockSize + 1)
+                const x = []
+                const y = []
+                for (let j = 0; j < sampleSize; j++) {
+                    const idx = (i * sampleSize + j) * 2
+                    const low = chunk[idx]
+                    const high = chunk[idx + 1]
+                    const token = toUInt16(low, high)
+                    if (j < sampleSize - 1) x.push(token)
+                    if (j > 0) y.push(token)
+                }
                 yield { x, y }
-                await sleep(1)
             }
         }
     }

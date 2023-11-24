@@ -1,4 +1,4 @@
-import { Config, EncodedDataset } from './tfjs-types.js'
+import { Config, EncodedDataset } from './tfjs-types'
 
 export default async function evaluate(
     tf: any,

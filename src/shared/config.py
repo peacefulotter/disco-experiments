@@ -32,7 +32,7 @@ configModels = {
     'gpt-nano': {'nLayer': 3, 'nHead': 3, 'nEmbd': 48},
 }
 
-modelType = 'gpt-mini'
+modelType = 'gpt-nano'
 model = configModels[modelType]
 dataset = 'wikitext'
 batchSize = 8
@@ -57,7 +57,7 @@ baseConfig = {
     'gradClip': 1,
     'scheduler': None,
     'dropout': 0,
-    'numWorkers': 4,
+    'numWorkers': 0,
     'vocabSize': 50257,
     'wandbProject': 'disco-gpt-benchmark',
     'evalFreq': 25,

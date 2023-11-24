@@ -1,11 +1,10 @@
-import * as tf from '@tensorflow/tfjs'
 import { model } from 'gpt-tfjs'
-import config from './config.js'
-import { BackendName, EncodedDataset } from './tfjs-types.js'
-import setBackend from './backend.js'
+import config from './config'
+import { BackendName, EncodedDataset } from './tfjs-types'
+import setBackend from './backend'
 const { GPTLMHeadModel } = model
 
-function prepareIdx(idx: any) {
+function prepareIdx(tf: any, idx: any) {
     tf.tidy(() => {
         // Check if idx is a tensor or an array
         if (idx instanceof tf.Tensor) {
@@ -27,7 +26,7 @@ function prepareIdx(idx: any) {
     return idx
 }
 
-function generateOnce(model: any, idx: any, config: any) {
+function generateOnce(tf: any, model: any, idx: any, config: any) {
     let idxNext
     let timePerToken = performance.now()
     let timePrediction = 0
@@ -78,9 +77,10 @@ export default async function inference(
     for (let i = 0; i < 8; i++) {
         const { value } = await iter.next()
         const { x: tokens } = value
-        const idx = prepareIdx(tokens)
+        const idx = prepareIdx(tf, tokens)
         for (let step = 0; step < maxNewTokens; step++) {
             const { timePerToken, timePrediction } = generateOnce(
+                tf,
                 gpt.model,
                 idx,
                 params
