@@ -45,25 +45,25 @@ def main(args):
 
     args.lr = configs['lr']
     args.opt = configs['optimizer']
-    args.n_head = configs['n_head']
-    args.n_embd = configs['n_embd']
-    args.n_layer = configs['n_layer']
+    args.n_head = configs['nHead']
+    args.n_embd = configs['nEmbd']
+    args.n_layer = configs['nLayer']
     args.dropout = configs['dropout']
     args.dataset = configs['dataset']
     args.scheduler = configs['scheduler'] if configs['scheduler'] != None else 'none'
-    args.max_iters = configs['max_iters']
-    args.batch_size = configs['batch_size']
-    args.iterations = configs['max_iters']
-    args.weight_decay = configs['weight_decay']
-    args.wandb_project = configs['wandb_project']
-    args.sequence_length = configs['seq_length']
-    args.eval_freq = configs['eval_freq']
-    args.eval_seq_prefix = configs['eval_seq_prefix']
+    args.max_iters = configs['maxIter']
+    args.batch_size = configs['batchSize']
+    args.iterations = configs['maxIter']
+    args.weight_decay = configs['weightDecay']
+    args.wandb_project = configs['wandbProject']
+    args.sequence_length = configs['blockSize']
+    args.eval_freq = configs['evalFreq']
+    args.eval_seq_prefix = configs['evalSeqPrefix']
 
     args.acc_steps = 1
     args.wandb = True
 
-    exp_name = 'llm-baseline_cpu_' + configs['wandb_name']
+    exp_name = 'llm-baseline_cpu_' + configs['wandbName']
 
 
     torch.backends.cuda.matmul.allow_tf32 = True # allows us to make sure we're able to use tensorfloat32 during training

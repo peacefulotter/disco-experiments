@@ -1,23 +1,53 @@
-
-# generated using: https://www.codeconvert.ai/typescript-to-python-converter
-# and entering the train-config.ts file
+configModels = {
+    'gpt2': {
+        'nLayer': 12,
+        'nHead': 12,
+        'nEmbd': 768,
+        'vocabSize': 50257,
+        'blockSize': 1024,
+    },
+    'gpt2-medium': {
+        'nLayer': 24,
+        'nHead': 16,
+        'nEmbd': 1024,
+        'vocabSize': 50257,
+        'blockSize': 1024,
+    },
+    'gpt2-large': {
+        'nLayer': 36,
+        'nHead': 20,
+        'nEmbd': 1280,
+        'vocabSize': 50257,
+        'blockSize': 1024,
+    },
+    'gpt2-xl': {
+        'nLayer': 48,
+        'nHead': 25,
+        'nEmbd': 1600,
+        'vocabSize': 50257,
+        'blockSize': 1024,
+    },
+    'gpt-mini': {'nLayer': 6, 'nHead': 6, 'nEmbd': 192},
+    'gpt-micro': {'nLayer': 4, 'nHead': 4, 'nEmbd': 128},
+    'gpt-nano': {'nLayer': 3, 'nHead': 3, 'nEmbd': 48},
+}
 
 modelType = 'gpt-mini'
+model = configModels[modelType]
 dataset = 'wikitext'
 batchSize = 8
-seqLength = 128
+blockSize = 128  # = sequence length
 lr = 0.001
 maxIter = 300
+
 baseConfig = {
     'debug': False,
     'verbose': False,
     'modelType': modelType,
-    'nHead': 3,
-    'nLayer': 3,
-    'nEmbd': 48,
+    **model,
     'dataset': dataset,
     'batchSize': batchSize,
-    'blockSize': seqLength,
+    'blockSize': blockSize,
     'lr': lr,
     'maxIter': maxIter,
     'shuffle': False,
@@ -34,10 +64,10 @@ baseConfig = {
     'evalSeqPrefix': 'none',
     'maxEvalBatches': 24,
 }
+
 config = {
     **baseConfig,
-    'wandbName': f"{modelType}_{dataset}_bs={batchSize}_seq={seqLength}_lr={lr}_iter={maxIter}",
+    'wandbName': f"{modelType}_{dataset}_bs={batchSize}_seq={blockSize}_lr={lr}_iter={maxIter}",
 }
 
-config
 
