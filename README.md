@@ -6,7 +6,7 @@ Feel free to have a look at `./src/config.ts` which is a file shared between the
 
 ```sh
 $ git clone
-$ cd disco-experiments/
+$ cd disco-experiments/src/shared/
 $ npm install -g typescript ts-node
 $ npm install
 ```

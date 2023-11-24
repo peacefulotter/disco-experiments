@@ -32,12 +32,7 @@ export default async function evaluate(
         acc[0] += await acc_sum.array()
         acc[1] += acc_tensor.shape[0] * acc_tensor.shape[1]
 
-        acc_tensor.dispose()
-        acc_sum.dispose()
-        loss.dispose()
-        logits.dispose()
-        x.dispose()
-        y.dispose()
+        tf.dispose([acc_tensor, acc_sum, loss, logits, x, y])
 
         iteration++
     }

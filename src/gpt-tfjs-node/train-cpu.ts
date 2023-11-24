@@ -1,4 +1,4 @@
-import * as tf from "@tensorflow/tfjs-node";
-import main from "./train.js";
+import * as tf from '@tensorflow/tfjs-node'
+import main from './train.js'
 
-await main(tf, "cpu");
+await main(tf, 'node-cpu')
