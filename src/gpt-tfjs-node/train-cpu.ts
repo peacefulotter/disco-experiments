@@ -3,7 +3,7 @@ import train from './train.js'
 import setBackend from '../shared/backend.js'
 
 async function main() {
-    await setBackend('cpu')
+    await setBackend(tf, 'cpu')
     await train(tf, 'node-cpu')
 }
 main()

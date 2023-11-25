@@ -1,6 +1,6 @@
 import * as tf from '@tensorflow/tfjs-node'
 import { model } from 'gpt-tfjs'
-import getDataset from './dataset.js'
+import { getDataset } from '../shared/dataset-node.js'
 import config from '../shared/config.js'
 import evaluate from '../shared/evaluate.js'
 const { GPTLMHeadModel } = model

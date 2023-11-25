@@ -1,7 +1,6 @@
-import { BackendName } from '@/ml/backend'
 import fs from 'fs/promises'
 import path from 'path'
-import { Config } from '~/tfjs-types'
+import { Config, BackendName } from '~/tfjs-types'
 
 export async function POST(req: Request) {
     const { save, config, backendName } = (await req.json()) as {
@@ -12,7 +11,7 @@ export async function POST(req: Request) {
     const json = JSON.stringify(save, null, 4)
     const p = path.join(
         process.cwd(),
-        'checkpoints',
+        'wandb',
         `${backendName}_${config.wandbName}.json`
     )
     await fs.writeFile(p, json, 'utf-8')

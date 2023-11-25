@@ -1,3 +1,7 @@
+-   Install bun
+
+...
+
 # Setup
 
 Feel free to have a look at `./src/config.ts` which is a file shared between the browser and the node versions. It is the main config file where you can change lots of parameters regarding the model, the training itself, and more.

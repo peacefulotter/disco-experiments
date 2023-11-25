@@ -4,7 +4,7 @@ import train from './train.js'
 import setBackend from '../shared/backend.js'
 
 async function main() {
-    await setBackend('tensorflow')
+    await setBackend(tf, 'tensorflow')
     await train(tf, 'node-gpu')
 }
 main()

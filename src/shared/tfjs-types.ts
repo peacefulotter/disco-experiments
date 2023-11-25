@@ -1,5 +1,5 @@
 import * as tf from '@tensorflow/tfjs'
-import config, { configModels } from './config'
+import { configModels } from './config.js'
 
 export type BackendName = 'cpu' | 'webgl' | 'webgpu' | 'tensorflow'
 
@@ -37,9 +37,8 @@ export type Config = {
     blockSize: number
     lr: number
     maxIter: number
-    shuffle: boolean | string
-    weightDecay: boolean
-    weight_decay: number
+    shuffle: true | 'batch' | number
+    weightDecay: boolean | number
     optimizer: string
     gradClip: number
     scheduler: string | null

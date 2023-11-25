@@ -1,7 +1,6 @@
-import * as tf from '@tensorflow/tfjs-core'
 import { BackendName } from './tfjs-types'
 
-export default async function setBackend(backendName: BackendName) {
+export default async function setBackend(tf: any, backendName: BackendName) {
     console.log('Backend availables:', tf.engine().backendNames())
 
     await tf.setBackend(backendName)

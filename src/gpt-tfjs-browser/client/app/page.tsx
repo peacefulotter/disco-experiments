@@ -4,6 +4,7 @@ import datasetTest from '@/ml/dataset-test'
 import inferenceTest from '@/ml/inference-test'
 import trainGPU from '@/ml/train-gpu'
 import wandbTest from '@/ml/wandb-test'
+import config from '~/config'
 import { ReactNode } from 'react'
 
 // import Chart from "@/components/Chart";
@@ -46,6 +47,7 @@ export default function Home() {
                 callback={() => inferenceTest('webgpu')}
                 name="Inference webgpu"
             />
+            <pre>{JSON.stringify(config, null, 2)}</pre>
         </main>
     )
 }

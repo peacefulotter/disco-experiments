@@ -1,4 +1,4 @@
-import { Config, Models as Model } from './tfjs-types'
+import { Config, Models as Model } from './tfjs-types.js'
 
 export const configModels = {
     gpt2: {
@@ -54,9 +54,8 @@ const baseConfig = {
     blockSize,
     lr,
     maxIter,
-    shuffle: false,
-    weightDecay: false,
-    weight_decay: 0.001,
+    shuffle: NaN,
+    weightDecay: 0.001,
     optimizer: 'adamw',
     gradClip: 1,
     scheduler: null,

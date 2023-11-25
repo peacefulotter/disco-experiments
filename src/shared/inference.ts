@@ -65,7 +65,7 @@ export default async function inference(
     dataset: EncodedDataset,
     backendName: BackendName
 ) {
-    await setBackend(backendName)
+    await setBackend(tf, backendName)
 
     const gpt = GPTLMHeadModel(config)
 

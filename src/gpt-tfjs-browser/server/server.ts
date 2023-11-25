@@ -1,7 +1,7 @@
-import 'module-alias/register.js'
+import 'module-alias/register'
 import express from 'express'
 import * as http from 'http'
-import initWebsockets from './socket.js'
+import initWebsockets from './socket'
 
 const PORT = process.env.PORT || 3001
 

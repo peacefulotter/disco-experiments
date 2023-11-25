@@ -17,11 +17,13 @@ export default async function getDataset(config: Config, split: string) {
 
     const requestNext = async () =>
         new Promise<number[]>((resolve) => {
+            // console.time('requestNext')
             ws.onmessage = (payload) => {
                 const buffer = JSON.parse(payload.data) as {
                     type: Buffer
                     data: number[]
                 }
+                // console.timeEnd('requestNext')
                 resolve(buffer.data)
             }
             setTimeout(() => ws.send('req'), 1)

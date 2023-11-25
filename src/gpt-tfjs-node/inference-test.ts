@@ -1,6 +1,6 @@
 import * as tf from '@tensorflow/tfjs-node-gpu'
 import config from '../shared/config.js'
-import getDataset from './dataset.js'
+import { getDataset } from '../shared/dataset-node.js'
 import inference from '../shared/inference.js'
 
 async function main() {

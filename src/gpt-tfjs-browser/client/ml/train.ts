@@ -1,5 +1,4 @@
 import * as tf from '@tensorflow/tfjs'
-import '@tensorflow/tfjs-backend-webgpu'
 
 import { model } from 'gpt-tfjs'
 import getDataset from './dataset'
@@ -12,7 +11,7 @@ import { BackendName } from '~/tfjs-types'
 const { GPTLMHeadModel } = model
 
 export default async function main(prefix: string, backendName: BackendName) {
-    await setBackend(backendName)
+    await setBackend(tf, backendName)
 
     const { dataset, closeWS } = await getDataset(config, 'train')
 

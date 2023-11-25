@@ -1,5 +1,5 @@
 import { WebSocketServer } from 'ws'
-import { Server } from './types'
+import { Server } from './types.js'
 import {
     getDatasetFile,
     getIteratorDatasetFromFile,
