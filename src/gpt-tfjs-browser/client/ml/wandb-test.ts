@@ -1,5 +1,5 @@
 import config from '~/config'
-import wandb from '@wandb/sdk'
+// import wandb from '@wandb/sdk'
 
 const log = async (v: number) => {
     await fetch('/api/wandb/log', {

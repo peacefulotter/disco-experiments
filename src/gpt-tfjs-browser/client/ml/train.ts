@@ -1,8 +1,8 @@
 import * as tf from '@tensorflow/tfjs'
-
 import { model } from 'gpt-tfjs'
+
 import getDataset from './dataset'
-import * as wandb from './wandb'
+import Wandb from '~/wandb'
 import setBackend from '~/backend'
 import evaluate from '~/evaluate'
 import config from '~/config'
@@ -17,8 +17,8 @@ export default async function main(prefix: string, backendName: BackendName) {
 
     console.log(config)
 
-    const save: any = { init: undefined, logs: [] }
-    await wandb.init(save, config, prefix + '_' + backendName)
+    const wandb = new Wandb(config)
+    await wandb.init(prefix, backendName)
 
     console.log('Running', config.modelType)
     const gpt = GPTLMHeadModel(config)
@@ -45,7 +45,7 @@ export default async function main(prefix: string, backendName: BackendName) {
             // TODO: eval like in llm-baselines with table
         }
 
-        await wandb.log(save, payload)
+        await wandb.log(payload)
         time = Date.now()
     }
 
@@ -54,7 +54,7 @@ export default async function main(prefix: string, backendName: BackendName) {
         callbacks: [cb],
     })
 
-    await wandb.finish(save, config, backendName)
+    await wandb.finish()
 
     closeWS()
 }

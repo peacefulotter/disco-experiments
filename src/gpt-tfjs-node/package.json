@@ -1,13 +1,16 @@
 {
     "type": "module",
+    "scripts": {
+        "train:gpu": "bun train-gpu.ts",
+        "train:cpu": "ts-node-esm train-cpu.ts"
+    },
     "dependencies": {
         "@tensorflow/tfjs-node": "4.4.0",
         "@tensorflow/tfjs-node-gpu": "4.4.0",
         "@wandb/sdk": "^0.5.1",
         "filestream": "^5.0.0",
         "gpt-tfjs": "^0.0.5",
-        "gpt-tokenizer": "^2.1.2",
-        "wandb": "^0.1.0"
+        "gpt-tokenizer": "^2.1.2"
     },
     "devDependencies": {
         "@types/node": "^20.8.6",

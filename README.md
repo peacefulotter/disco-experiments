@@ -1,6 +1,15 @@
--   Install bun
+# Prerequisites
 
-...
+-   Install bun
+    -   TODO
+-   Missing cuda .so files
+    -   sudo apt install nvidia-cuda-toolkit
+-   To fix "successful NUMA node read from SysFS had negative value (-1)":
+    -   for a in /sys/bus/pci/devices/\*; do echo 0 | sudo tee -a $a/numa_node; done
+    -   (https://github.com/tensorflow/tensorflow/issues/42738)
+-   cuDNN Install
+    -   sudo apt install nvidia-cudnn
+    -   OR see: https://stackoverflow.com/questions/66977227/could-not-load-dynamic-library-libcudnn-so-8-when-running-tensorflow-on-ubun
 
 # Setup
 

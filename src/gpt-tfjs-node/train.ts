@@ -1,23 +1,22 @@
-import wandb from '@wandb/sdk'
 import { model } from 'gpt-tfjs'
 import { getDataset } from '../shared/dataset-node.js'
+import Wandb from '../shared/wandb.js'
 import config from '../shared/config.js'
 import evaluate from '../shared/evaluate.js'
+import { BackendName } from '~/tfjs-types.js'
+import setBackend from '~/backend.js'
 const { GPTLMHeadModel } = model
 
 // TODO: move train to shared, once wandb is fixed?
 
-export default async function train(tf: any, prefix: string) {
-    const date = new Date().toISOString()
+export default async function train(tf: any, backendName: BackendName) {
+    await setBackend(tf, backendName)
     const trainDataset = await getDataset(config, 'train')
 
-    console.log(config, prefix)
+    console.log(config)
 
-    await wandb.init({
-        project: config.wandbProject,
-        name: `${prefix}_${config.wandbName}`,
-        config: { ...config, date },
-    })
+    const wandb = new Wandb(config)
+    await wandb.init('node', backendName)
 
     console.log('Running', config.modelType)
     const gpt = GPTLMHeadModel(config)
@@ -47,7 +46,6 @@ export default async function train(tf: any, prefix: string) {
     }
     await gpt.train(trainDataset, {
         ...config,
-        shuffle: 'batch',
         callbacks: [cb],
     })
 
