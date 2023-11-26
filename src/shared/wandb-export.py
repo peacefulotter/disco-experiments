@@ -7,11 +7,18 @@ import sys
 sys.path.append(os.path.abspath('../../shared/'))
 from config import config
 
-if len(sys.argv) < 2:
-    print('Please provide the backend name as an argument, e.g. "python wandb-export.py webgpu", allowed backends are: "webgpu", "webgl", "cpu')
+if len(sys.argv) < 3:
+    print('''
+Please provide a platform and backend name as an argument
+e.g. "python wandb-export.py browser webgpu", 
+          
+    allowed platforms are: "browser", "node"
+    allowed backends are: "webgpu", "webgl", "cpu", "tensorflow"
+    ''')
     exit()
 
-backend_name = sys.argv[1]
+platform = sys.argv[1]
+backend_name = sys.argv[2]
 
 file_name = f'{backend_name}_{config["wandbName"]}.json'
 path = os.path.join(os.path.dirname(__file__), 'checkpoints', file_name)
