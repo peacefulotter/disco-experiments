@@ -2,7 +2,7 @@
 
 import datasetTest from '@/ml/dataset-test'
 import inferenceTest from '@/ml/inference-test'
-import trainGPU from '@/ml/train-gpu'
+import train from '@/ml/train'
 import wandbTest from '@/ml/wandb-test'
 import config from '~/config'
 import { ReactNode } from 'react'
@@ -25,7 +25,7 @@ const Btn = ({ callback, name }: { callback: () => void; name: ReactNode }) => {
     return (
         <button
             onClick={callback}
-            className="px-8 py-2 bg-slate-300 rounded capitalize"
+            className="px-8 py-3 bg-neutral-800 rounded capitalize hover:bg-neutral-700 transition-colors"
         >
             {name}
         </button>
@@ -35,8 +35,8 @@ const Btn = ({ callback, name }: { callback: () => void; name: ReactNode }) => {
 export default function Home() {
     return (
         <main className="grid grid-cols-2 grid-rows-3 p-12 gap-4">
-            <Btn callback={() => trainGPU('webgpu')} name="Train webgpu" />
-            <Btn callback={() => trainGPU('webgl')} name="train webgl" />
+            <Btn callback={() => train('webgpu')} name="Train webgpu" />
+            <Btn callback={() => train('webgl')} name="train webgl" />
             <Btn callback={() => datasetTest()} name="Dataset test" />
             <Btn callback={() => wandbTest()} name="Wandb test" />
             <Btn

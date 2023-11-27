@@ -5,12 +5,13 @@
         "allowJs": true,
         "skipLibCheck": true,
         "strict": true,
-        "noEmit": false,
+        "noEmit": true,
         "esModuleInterop": true,
-        "module": "NodeNext",
-        "moduleResolution": "Bundler",
+        "module": "esnext",
+        "moduleResolution": "bundler",
         "resolveJsonModule": true,
         "isolatedModules": true,
+        "allowImportingTsExtensions": true,
         "jsx": "preserve",
         "incremental": true,
         "checkJs": false,
@@ -21,17 +22,17 @@
         ],
         "paths": {
             "@/*": ["./*"],
-            "~/*": ["../../shared/*"]
+            "~/*": ["../../shared/*"],
+            "gpt-tfjs": ["../../gpt-tfjs"]
         }
     },
     "include": [
         "next-env.d.ts",
-        "decs.d.ts",
         "**/*.ts",
         "**/*.tsx",
-        "**/*.js",
-        "**/*.mjs",
-        ".next/types/**/*.ts"
+        ".next/types/**/*.ts",
+        "decs.d.ts",
+        "../../shared/**/*.ts"
     ],
     "exclude": ["node_modules"]
 }

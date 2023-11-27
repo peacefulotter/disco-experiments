@@ -1,4 +1,5 @@
 import config from '~/config'
+import Wandb from '~/wandb'
 // import wandb from '@wandb/sdk'
 
 const log = async (v: number) => {
@@ -43,4 +44,12 @@ export default async function wandbTest() {
     // await fetch("/api/wandb/finish", {
     //   method: "POST",
     // });
+    const wandb = new Wandb(config, 'test', 'cpu')
+    wandb.log({ v: 0 })
+    wandb.log({ v: 1 })
+    try {
+        wandb.finish()
+    } catch (e) {
+        console.log(e)
+    }
 }
