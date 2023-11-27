@@ -1,5 +1,5 @@
 import * as tf from '@tensorflow/tfjs'
-import { configModels } from './config.js'
+import { configModels } from './config'
 
 export type BackendName = 'cpu' | 'webgl' | 'webgpu' | 'tensorflow'
 

@@ -1,4 +1,4 @@
-import { Config, Models as Model } from './tfjs-types.js'
+import { Config, Models as Model } from './tfjs-types'
 
 export const configModels = {
     gpt2: {
@@ -40,7 +40,7 @@ const dataset = 'wikitext'
 const batchSize = 8
 const blockSize = 128 // = sequence length
 const lr = 0.001
-const maxIter = 300
+const maxIter = 10
 
 const baseConfig = {
     debug: false,

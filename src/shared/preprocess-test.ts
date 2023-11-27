@@ -1,6 +1,6 @@
-import config from './config'
-import { getDataset } from './dataset-node'
-import preprocess from './preprocess'
+import config from './config.js'
+import { getDataset } from './dataset-node.js'
+import preprocess from './preprocess.js'
 
 const dataset = await getDataset(config, 'valid')
 const iter = await dataset.iterator()

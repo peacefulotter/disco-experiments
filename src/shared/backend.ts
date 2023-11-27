@@ -1,4 +1,4 @@
-import { BackendName } from './tfjs-types'
+import { BackendName } from './tfjs-types.js'
 
 export default async function setBackend(tf: any, backendName: BackendName) {
     console.log('Backend availables:', tf.engine().backendNames())

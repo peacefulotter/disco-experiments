@@ -1,45 +1,43 @@
 // import wandb from '@wandb/sdk'
-import { Config, BackendName } from './tfjs-types'
-import wandbWrite from './wandb-node'
+import { Config, BackendName } from './tfjs-types.js'
 
 export type WandbSave = {
-    init?: {
+    init: {
         config: Config
         prefix: string
         date: string
     }
-    logs?: any[]
+    logs: any[]
 }
 
 export default class Wandb {
-    private save: WandbSave
-    private config: Config
+    public save: WandbSave
+    public config: Config
 
-    constructor(config: Config) {
-        this.save = {}
+    constructor(config: Config, prefix: string, backendName: BackendName) {
+        const date = new Date().toISOString()
+        this.save = {
+            init: {
+                config,
+                prefix: `${prefix}_${backendName}`,
+                date,
+            },
+            logs: [],
+        }
         this.config = config
     }
 
-    public async init(prefix: string, backendName: BackendName) {
-        const date = new Date().toISOString()
-        this.save.init = {
-            config: this.config,
-            prefix: `${prefix}_${backendName}`,
-            date,
-        }
-
-        // await fetch("/api/wandb/init", {
-        //   method: "POST",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //   },
-        //   body: JSON.stringify({
-        //     config,
-        //     prefix,
-        //     date,
-        //   }),
-        // });
-    }
+    // await fetch("/api/wandb/init", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({
+    //     config,
+    //     prefix,
+    //     date,
+    //   }),
+    // });
 
     public async log(payload: any) {
         console.log(payload)
@@ -60,22 +58,20 @@ export default class Wandb {
         //   method: "POST",
         // });
 
-        const isBrowser: boolean =
-            typeof window !== 'undefined' &&
-            typeof window.document !== 'undefined'
+        // const isBrowser: boolean =
+        //     typeof window !== 'undefined' &&
+        //     typeof window.document !== 'undefined'
+        // console.log(isBrowser)
 
-        if (isBrowser) {
-            const res = await fetch('/api/save', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    save: this.save,
-                    config: this.config,
-                }),
-            })
-            console.log(res)
-        } else wandbWrite(this.save, this.config)
+        const res = await fetch('/api/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                save: this.save,
+            }),
+        })
+        console.log(res)
     }
 }

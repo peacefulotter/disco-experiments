@@ -1,4 +1,4 @@
-import writeWandb from '~/wandb-node'
+import WandbNode from '~/wandb-node'
 import { Config } from '~/tfjs-types'
 
 export async function POST(req: Request) {
@@ -6,6 +6,8 @@ export async function POST(req: Request) {
         save: any
         config: Config
     }
-    await writeWandb(save, config)
+    const wandb = new WandbNode(config)
+    wandb.save = save
+    wandb.finish()
     return Response.json('ok')
 }
