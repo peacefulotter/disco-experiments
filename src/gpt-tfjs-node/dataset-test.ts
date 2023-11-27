@@ -8,8 +8,8 @@ async function main() {
     dataset = dataset.batch(testConfig.batchSize)
     const iter = await dataset.iterator()
 
-    performance.mark('iter-start')
-    const iterations = 300
+    console.time('iter-start')
+    const iterations = 1000
     for (let i = 0; i < iterations; i++) {
         const t0 = performance.now()
         const { value } = await iter.next()
@@ -25,8 +25,8 @@ async function main() {
 
         tf.dispose([x, y])
     }
-    performance.mark('iter-end')
-    const measure = performance.measure('iter', 'iter-start', 'iter-end')
-    console.log('average:', measure.duration / iterations)
+    console.timeEnd('iter-end')
+    // const measure = performance.measure('iter', 'iter-start', 'iter-end')
+    // console.log('average:', measure.duration / iterations)
 }
 main()

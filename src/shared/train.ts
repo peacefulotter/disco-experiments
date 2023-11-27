@@ -1,4 +1,4 @@
-import { model } from 'gpt-tfjs'
+import { model } from '#/gpt-tfjs'
 
 import Wandb from './wandb'
 import setBackend from './backend'

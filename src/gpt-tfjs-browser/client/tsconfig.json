@@ -23,7 +23,7 @@
         "paths": {
             "@/*": ["./*"],
             "~/*": ["../../shared/*"],
-            "gpt-tfjs": ["../../gpt-tfjs"]
+            "#/gpt-tfjs": ["../../gpt-tfjs"]
         }
     },
     "include": [

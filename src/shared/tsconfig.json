@@ -1,5 +1,7 @@
 {
     "compilerOptions": {
+        "rootDir": "..",
+        "rootDirs": [".", "../gpt-tfjs"],
         "lib": ["ESNext"],
         "module": "esnext",
         "target": "esnext",
@@ -19,6 +21,12 @@
         "allowJs": true,
         "types": [
             "bun-types" // add Bun global
-        ]
-    }
+        ],
+        "paths": {
+            "@/*": ["./*"],
+            "#/gpt-tfjs": ["../gpt-tfjs"]
+        }
+    },
+    "include": ["**/*.ts", "../gpt-tfjs/**/*.js"],
+    "exclude": ["node_modules"]
 }

@@ -1,7 +1,7 @@
 import * as tf from '@tensorflow/tfjs-node-gpu'
-import config from '../shared/config.js'
-import { getDataset } from '../shared/dataset-node.js'
-import inference from '../shared/inference.js'
+import config from '~/config'
+import { getDataset } from '~/dataset-node'
+import inference from '~/inference'
 
 async function main() {
     const backendName = 'tensorflow'

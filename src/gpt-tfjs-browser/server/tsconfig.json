@@ -3,6 +3,8 @@
         "require": ["ts-node/register", "tsconfig-paths/register"]
     },
     "compilerOptions": {
+        "rootDir": "..",
+        "rootDirs": [".", "../shared"],
         "baseUrl": "./",
         "esModuleInterop": true,
         "moduleResolution": "Bundler",
@@ -21,7 +23,7 @@
         "checkJs": false,
         "paths": {
             "@/*": ["./*"],
-            "~/*": ["../../shared/*"] // doesn't work unfortunately
+            "~/*": ["../../shared/*"]
         }
     },
     "include": [

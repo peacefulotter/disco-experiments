@@ -1,8 +1,8 @@
-import { getDataset } from '../shared/dataset-node.js'
-import config from '~/config.js'
-import train from '~/train.js'
-import { BackendName } from '~/tfjs-types.js'
-import WandbNode from '~/wandb-node.js'
+import { getDataset } from '~/dataset-node'
+import config from '~/config'
+import train from '~/train'
+import { BackendName } from '~/tfjs-types'
+import WandbNode from '~/wandb-node'
 
 export default async function main(tf: any, backendName: BackendName) {
     const getDatasetRoutine = (split: string) => async () => ({

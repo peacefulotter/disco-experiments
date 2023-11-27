@@ -1,26 +1,42 @@
 {
     "compilerOptions": {
-        "baseUrl": "./",
-        "esModuleInterop": true,
-        "moduleResolution": "Bundler",
-        "module": "NodeNext",
+        "rootDir": "..",
+        "rootDirs": [".", "../shared", "../gpt-tfjs"],
+        "lib": ["ESNext"],
+        "module": "esnext",
         "target": "esnext",
-        "outDir": "./dist",
+        "moduleResolution": "bundler",
+        "moduleDetection": "force",
+        "allowImportingTsExtensions": true,
+        "noEmit": true,
+        "composite": true,
         "strict": true,
+        "downlevelIteration": true,
+        "skipLibCheck": true,
+        "jsx": "react-jsx",
+        "allowSyntheticDefaultImports": true,
+        "forceConsistentCasingInFileNames": true,
         "allowJs": true,
         "declaration": true,
         "emitDeclarationOnly": false,
-        "skipLibCheck": true,
         "resolveJsonModule": true,
-        "noEmit": true,
         "isolatedModules": true,
         "incremental": true,
         "checkJs": false,
+        "types": [
+            "bun-types" // add Bun global
+        ],
         "paths": {
             "@/*": ["./*"],
-            "~/*": ["../shared/*"] // doesn't work unfortunately
+            "~/*": ["../shared/*"],
+            "#/gpt-tfjs": ["../gpt-tfjs"]
         }
     },
-    "include": ["../../shared/**/*.ts", "./**/*.ts", "./**/*.js", "decs.d.ts"],
-    "exclude": ["./node_modules/**/*", "./dist/**/*"]
+    "include": [
+        "**/*.ts",
+        "decs.d.ts",
+        "../shared/**/*.ts",
+        "../gpt-tfjs/**/*.js"
+    ],
+    "exclude": ["node_modules"]
 }
