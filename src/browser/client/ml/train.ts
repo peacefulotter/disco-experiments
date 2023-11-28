@@ -1,7 +1,4 @@
 import * as tf from '@tensorflow/tfjs'
-import '@tensorflow/tfjs-backend-webgpu'
-import '@tensorflow/tfjs-backend-wasm'
-
 import getDataset from './dataset'
 import train from '~/train'
 import Wandb from '~/wandb'

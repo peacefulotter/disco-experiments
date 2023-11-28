@@ -14,6 +14,7 @@ const getWebSocket = async (split: string) =>
 
 export default async function getDataset(config: Config, split: string) {
     const ws = await getWebSocket(split)
+    console.log(ws)
 
     const requestNext = async () =>
         new Promise<number[]>((resolve) => {

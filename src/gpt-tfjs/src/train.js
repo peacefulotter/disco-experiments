@@ -1,7 +1,12 @@
 const tf = require('@tensorflow/tfjs')
-const { AdamW, clipByGlobalNorm, clipByGlobalNormObj, l2Loss } = require('./optimizers')
+const {
+    AdamW,
+    clipByGlobalNorm,
+    clipByGlobalNormObj,
+    l2Loss,
+} = require('./optimizers')
 
-async function train (model, ds, config) {
+async function train(model, ds, config) {
     const defaultConfig = {
         epochs: null,
         maxIter: null,
@@ -9,7 +14,7 @@ async function train (model, ds, config) {
         shuffle: true,
         lr: 6e-4,
         weightDecay: false,
-        callbacks: []
+        callbacks: [],
     }
     config = Object.assign(defaultConfig, config || {})
 
@@ -21,27 +26,34 @@ async function train (model, ds, config) {
         ds = ds.shuffle(config.shuffle)
     }
     ds = ds.batch(config.batchSize)
-    
+
     var includeInWeightDecay = []
     var excludeFromWeightDecay = []
-    
+
     if (config.weightDecay === true) {
         config.weightDecay = 1e-4
     }
     if (config.weightDecay) {
-        model.getNamedWeights().forEach(v => {
+        model.getNamedWeights().forEach((v) => {
             if (
-                v.name.includes('bias') 
-                || v.name.includes('normalization') 
-                || v.name.includes('emb') 
+                v.name.includes('bias') ||
+                v.name.includes('normalization') ||
+                v.name.includes('emb')
             ) {
                 excludeFromWeightDecay.push(v.name)
             } else {
                 includeInWeightDecay.push(v.name)
             }
         })
-        var opt = new AdamW(config.lr, config.weightDecay, includeInWeightDecay, excludeFromWeightDecay)
+        console.log('[gpt-tfjs] Using custom AdamW optimizer')
+        var opt = new AdamW(
+            config.lr,
+            config.weightDecay,
+            includeInWeightDecay,
+            excludeFromWeightDecay
+        )
     } else {
+        console.log('[gpt-tfjs] Using built-in Adam optimizer')
         var opt = tf.train.adam(config.lr)
     }
 
@@ -59,7 +71,7 @@ async function train (model, ds, config) {
             iterator = await ds.iterator()
             next = await iterator.next()
         }
-        const {x, y} = next.value
+        const { x, y } = next.value
 
         // Keep loss for reporting
         let loss
@@ -69,7 +81,7 @@ async function train (model, ds, config) {
             return loss
         }
         tf.tidy(() => {
-            let {values, grads} = opt.computeGradients(optFunc)
+            let { values, grads } = opt.computeGradients(optFunc)
             let gradsClipped = clipByGlobalNormObj(grads, 1)
             opt.applyGradients(gradsClipped)
         })
@@ -97,11 +109,10 @@ async function train (model, ds, config) {
             console.log(`Epoch: ${epoch}, Step: ${iteration}, Loss: ${lossVal}`)
         }
 
-        await new Promise(resolve => setTimeout(resolve, 1))
+        await new Promise((resolve) => setTimeout(resolve, 1))
     }
-
 }
 
 module.exports = {
-    train
+    train,
 }

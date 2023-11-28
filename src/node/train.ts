@@ -1,10 +1,17 @@
+import * as tf from '@tensorflow/tfjs-node-gpu'
+import '@tensorflow/tfjs-backend-webgl'
+import '@tensorflow/tfjs-backend-wasm'
+import { setWasmPaths } from '@tensorflow/tfjs-backend-wasm'
+
 import { getDataset } from '~/dataset-node'
 import config from '~/config'
 import train from '~/train'
-import { BackendName } from '~/tfjs-types'
+import { NodeBackendName } from '~/tfjs-types'
 import WandbNode from '~/wandb-node'
 
-export default async function main(tf: any, backendName: BackendName) {
+setWasmPaths('./node_modules/@tensorflow/tfjs-backend-wasm/dist/')
+
+export default async function main(backendName: NodeBackendName) {
     const getDatasetRoutine = (split: string) => async () => ({
         dataset: await getDataset(config, split),
     })
@@ -15,3 +22,16 @@ export default async function main(tf: any, backendName: BackendName) {
 
     await train(tf, backendName, wandb, getTrainDataset, getEvalDataset)
 }
+
+const isBackendName = (name: string): name is NodeBackendName =>
+    name === 'cpu' || name === 'wasm' || name === 'tensorflow'
+
+if (process.argv.length < 3 || !isBackendName(process.argv[2])) {
+    console.error(
+        'Usage: bun train.ts <backend-name>, available backends: cpu, wasm, tensorflow'
+    )
+    process.exit(1)
+}
+
+const backendName = process.argv[2]
+main(backendName as NodeBackendName)

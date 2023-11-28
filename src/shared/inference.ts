@@ -1,6 +1,6 @@
-import { model } from 'gpt-tfjs'
+import { model } from '#/gpt-tfjs'
 import config from './config'
-import { BackendName, EncodedDataset } from './tfjs-types'
+import { BackendName, Config, EncodedDataset } from './tfjs-types'
 import setBackend from './backend'
 const { GPTLMHeadModel } = model
 
@@ -60,6 +60,11 @@ function generateOnce(tf: any, model: any, idx: any, config: any) {
     }
 }
 
+type InferenceConfig = Config & {
+    maxLength: number
+    temperature: number
+}
+
 export default async function inference(
     tf: any,
     dataset: EncodedDataset,
@@ -70,7 +75,12 @@ export default async function inference(
     const gpt = GPTLMHeadModel(config)
 
     const maxNewTokens = 20
-    const params = { maxLength: 32, temperature: 1, ...config }
+    const params: InferenceConfig = {
+        maxLength: 32,
+        temperature: 1,
+        ...config,
+        batchSize: 16,
+    }
     let stats: [number, number, number] = [0, 0, 0]
 
     const iter = await dataset.iterator()

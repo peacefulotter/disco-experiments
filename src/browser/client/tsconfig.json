@@ -1,5 +1,7 @@
 {
     "compilerOptions": {
+        "rootDir": "../..",
+        "rootDirs": [".", "../../shared", "../../gpt-tfjs"],
         "target": "es5",
         "lib": ["dom", "dom.iterable", "esnext"],
         "allowJs": true,

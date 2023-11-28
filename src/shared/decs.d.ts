@@ -1,1 +1,1 @@
-declare module 'gpt-tfjs'
+declare module '#/gpt-tfjs'

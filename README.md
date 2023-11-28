@@ -13,9 +13,7 @@
 │   │       └── socket.ts # WebSocket server for streaming the preprocessed dataset to the client
 │   ├── gpt-tfjs # Clone of the gpt-tfjs npm package, with some minor modifications
 │   ├── node # NodeJS version
-│   │   ├── train-cpu.ts # Training script for the 'cpu' backend
-│   │   ├── train-gpu.ts # Training script for the 'tensorflow' backend
-│   │   └── train.ts # Generic training script calling the training function from shared/train.ts
+│   │   └── train.ts # Training script calling the training function from shared/train.ts
 │   ├── pytorch # Pytorch version
 │   │   ├── llm-baselines # Clone of the llm-baselines repo, with some minor modifications, mainly to use the config.py file
 │   │   │   └── run.sh # Starts training with the config provided in src/shared/config.py
@@ -93,8 +91,7 @@ $ bun run dev
 ```sh
 $ cd ./src/node/
 $ bun install
-$ bun train-gpu.ts # for training on the 'tensorflow' backend, using a GPU
-$ bun train-cpu.ts # for training on the 'cpu' backend, using the CPU
+$ bun train.ts {backendname} # run training, backendname=cpu|tensorflow|wasm
 ```
 
 ## WandB
@@ -103,7 +100,7 @@ The pytorch tests work with wandb, but since the @wandb/sdk npm package is broke
 
 ```sh
 $ cd ./src/shared/
-$ python3 wandb-export.py {platform} {backendname} # platform=browser|node, backendname=webgl|webgpu|cpu|tensorflow
+$ python3 wandb-export.py {platform} {backendname} # platform=browser|node, backendname=webgl|webgpu|cpu|tensorflow|wasm
 ```
 
 # Fix errors & warnings

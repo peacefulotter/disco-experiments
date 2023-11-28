@@ -10,11 +10,14 @@
   },
   "dependencies": {
     "@tensorflow/tfjs": "^4.13.0",
+    "@tensorflow/tfjs-backend-wasm": "^4.13.0",
     "@tensorflow/tfjs-backend-webgpu": "^4.13.0",
     "next": "14.0.3",
+    "node-web-streams": "^0.2.2",
     "react": "^18",
     "react-dom": "^18",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "web-streams-node": "^0.4.0"
   },
   "devDependencies": {
     "@types/node": "^20",

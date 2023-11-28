@@ -8,6 +8,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@tensorflow/tfjs-backend-wasm": "^4.13.0",
     "@tensorflow/tfjs-node": "^4.13.0",
     "@tensorflow/tfjs-node-gpu": "^4.13.0"
   }

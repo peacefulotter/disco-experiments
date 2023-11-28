@@ -2,7 +2,7 @@ import * as tf from '@tensorflow/tfjs'
 import { configModels } from './config'
 
 export type BrowserBackendName = 'cpu' | 'webgl' | 'webgpu' | 'wasm'
-export type NodeBackendName = 'cpu' | 'tensorflow'
+export type NodeBackendName = 'cpu' | 'wasm' | 'tensorflow'
 export type BackendName = BrowserBackendName | NodeBackendName
 
 export type Models = keyof typeof configModels //, 'gpt2', 'gpt2-medium', 'gpt2-large', 'gpt2-xl']
@@ -40,7 +40,7 @@ export type Config = {
     lr: number
     maxIter: number
     shuffle: true | 'batch' | number
-    weightDecay: boolean | number
+    weightDecay: number | false
     optimizer: string
     gradClip: number
     scheduler: string | null

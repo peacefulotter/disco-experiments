@@ -55,7 +55,7 @@ const baseConfig = {
     lr,
     maxIter,
     shuffle: NaN,
-    weightDecay: 0.001,
+    weightDecay: false, // If set, wasm backend won't work because of the custom AdamW optimizer
     optimizer: 'adamw',
     gradClip: 1,
     scheduler: null,

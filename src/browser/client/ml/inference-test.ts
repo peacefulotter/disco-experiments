@@ -8,6 +8,6 @@ import getDataset from './dataset'
 
 export default async function inferenceTest(backendName: BrowserBackendName) {
     let { dataset, closeWS } = await getDataset(config, 'valid')
-    inference(tf, dataset, backendName)
+    await inference(tf, dataset, backendName)
     closeWS()
 }
