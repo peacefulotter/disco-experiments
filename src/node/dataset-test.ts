@@ -1,6 +1,6 @@
 import * as tf from '@tensorflow/tfjs-node'
-import { getDataset } from '../shared/dataset-node.js'
-import config from '../shared/config.js'
+import { getDataset } from './dataset-node.js'
+import config from './config.js'
 
 async function main() {
     const testConfig = { ...config, batchSize: 8, blockSize: 128 }
