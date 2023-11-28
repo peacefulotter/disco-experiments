@@ -1,6 +1,6 @@
 # File Structure
 
-```
+```sh
 .
 ├── datasets # Folder containing the installed and preprocessed datasets
 ├── src

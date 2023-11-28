@@ -1,26 +1,17 @@
 {
     "type": "module",
-    "imports": {
-        "~/*": "../../*",
-        "@/*": "./*"
-    },
-    "_moduleAliases": {
-        "~": "../../",
-        "@": "./"
-    },
     "name": "server",
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
     "scripts": {
-        "dev": "bun --hot server.ts",
+        "dev": "bun --bun --hot server.ts",
         "dev:nodemon": "nodemon --inspect server.ts",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "~": "../../",
         "express": "^4.18.2",
         "ws": "^8.14.2"
     },

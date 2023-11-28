@@ -7,10 +7,15 @@
         "rootDirs": [".", "../shared"],
         "baseUrl": "./",
         "esModuleInterop": true,
-        "moduleResolution": "Bundler",
-        "module": "NodeNext",
+        "module": "esnext",
         "target": "esnext",
+        "moduleResolution": "bundler",
+        "moduleDetection": "force",
         "outDir": "./dist",
+        "composite": true,
+        "downlevelIteration": true,
+        "allowSyntheticDefaultImports": true,
+        "forceConsistentCasingInFileNames": true,
         "strict": true,
         "allowJs": true,
         "declaration": true,
@@ -21,6 +26,9 @@
         "isolatedModules": true,
         "incremental": true,
         "checkJs": false,
+        "types": [
+            "bun-types" // add Bun global
+        ],
         "paths": {
             "@/*": ["./*"],
             "~/*": ["../../shared/*"]
