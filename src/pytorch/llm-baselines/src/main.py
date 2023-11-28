@@ -46,7 +46,8 @@ def main(args):
     args.n_head = train_config['nHead']
     args.n_embd = train_config['nEmbd']
     args.n_layer = train_config['nLayer']
-    args.dropout = train_config['dropout']
+    args.dropout = train_config['embdDrop']
+    args.bias = train_config['bias']
     args.dataset = train_config['dataset']
     args.scheduler = train_config['scheduler'] if train_config['scheduler'] != None else 'none'
     args.max_iters = train_config['maxIter']

@@ -1,0 +1,1 @@
+-   minGPT compatible with config.py and add a run.sh script

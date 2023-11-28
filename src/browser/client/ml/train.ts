@@ -1,13 +1,14 @@
 import * as tf from '@tensorflow/tfjs'
 import '@tensorflow/tfjs-backend-webgpu'
+import '@tensorflow/tfjs-backend-wasm'
 
 import getDataset from './dataset'
 import train from '~/train'
 import Wandb from '~/wandb'
 import config from '~/config'
-import { BackendName } from '~/tfjs-types'
+import { BrowserBackendName } from '~/tfjs-types'
 
-export default async function main(backendName: BackendName) {
+export default async function main(backendName: BrowserBackendName) {
     const getTrainDataset = async () => {
         const { dataset, closeWS } = await getDataset(config, 'train')
         return { dataset, onEnd: closeWS }

@@ -4,21 +4,23 @@
 .
 ├── datasets # Folder containing the installed and preprocessed datasets
 ├── src
-│   ├── pytorch # Pytorch version
-│   │   ├── llm-baselines
-│   │   │   ├── run.sh # Starts training with the config provided in src/shared/config.py
-│   │   └── minGPT
-│   ├── browser # Browser version
+│   ├── browser # JS browser version
 │   │   ├── client # NextJS client for training in the browser
 │   │   │   ├── app # NextJS app router folder, defining pages and api routes
 │   │   │   └── ml  # Folder containing the ML related scripts and tests
 │   │   └── server # Express server for serving the client
 │   │       ├── server.ts # Main file creating the express server listening to some given port
 │   │       └── socket.ts # WebSocket server for streaming the preprocessed dataset to the client
+│   ├── gpt-tfjs # Clone of the gpt-tfjs npm package, with some minor modifications
 │   ├── node # NodeJS version
 │   │   ├── train-cpu.ts # Training script for the 'cpu' backend
 │   │   ├── train-gpu.ts # Training script for the 'tensorflow' backend
 │   │   └── train.ts # Generic training script calling the training function from shared/train.ts
+│   ├── pytorch # Pytorch version
+│   │   ├── llm-baselines # Clone of the llm-baselines repo, with some minor modifications, mainly to use the config.py file
+│   │   │   └── run.sh # Starts training with the config provided in src/shared/config.py
+│   │   └── minGPT # Clone of the minGPT repo, with some minor modifications, mainly to use the config.py file
+|   |   |   └── run.sh # Starts training with the config provided in src/shared/config.py
 │   └── shared # Shared folder containing the shared scripts between the browser and node versions
 │       ├── config.py # Python version of config.ts
 │       ├── config.ts # Main config file for the model, training, and more

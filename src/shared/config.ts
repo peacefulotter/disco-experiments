@@ -59,7 +59,8 @@ const baseConfig = {
     optimizer: 'adamw',
     gradClip: 1,
     scheduler: null,
-    dropout: 0,
+    embdDrop: 0.2,
+    bias: true,
     numWorkers: 0,
     vocabSize: 50257,
 
@@ -72,6 +73,7 @@ const baseConfig = {
 
 const config: Config = {
     ...baseConfig,
+    residDrop: baseConfig.embdDrop,
     wandbName: `${modelType}_${dataset}_bs=${batchSize}_seq=${blockSize}_lr=${lr}_iter=${maxIter}`,
 } as const
 

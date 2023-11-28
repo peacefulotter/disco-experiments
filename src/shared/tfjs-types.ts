@@ -1,7 +1,9 @@
 import * as tf from '@tensorflow/tfjs'
 import { configModels } from './config'
 
-export type BackendName = 'cpu' | 'webgl' | 'webgpu' | 'tensorflow'
+export type BrowserBackendName = 'cpu' | 'webgl' | 'webgpu' | 'wasm'
+export type NodeBackendName = 'cpu' | 'tensorflow'
+export type BackendName = BrowserBackendName | NodeBackendName
 
 export type Models = keyof typeof configModels //, 'gpt2', 'gpt2-medium', 'gpt2-large', 'gpt2-xl']
 
@@ -42,7 +44,9 @@ export type Config = {
     optimizer: string
     gradClip: number
     scheduler: string | null
-    dropout: number
+    embdDrop: number
+    residDrop: number
+    bias: boolean
     numWorkers: number
     vocabSize: number
     wandbProject: string

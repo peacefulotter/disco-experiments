@@ -1,7 +1,4 @@
 {
-    "ts-node": {
-        "require": ["ts-node/register", "tsconfig-paths/register"]
-    },
     "compilerOptions": {
         "rootDir": "..",
         "rootDirs": [".", "../shared"],

@@ -35,8 +35,9 @@ const Btn = ({ callback, name }: { callback: () => void; name: ReactNode }) => {
 export default function Home() {
     return (
         <main className="grid grid-cols-2 grid-rows-3 p-12 gap-4">
-            <Btn callback={() => train('webgpu')} name="Train webgpu" />
+            <Btn callback={() => train('webgpu')} name="train webgpu" />
             <Btn callback={() => train('webgl')} name="train webgl" />
+            <Btn callback={() => train('wasm')} name="train wasm" />
             <Btn callback={() => datasetTest()} name="Dataset test" />
             <Btn callback={() => wandbTest()} name="Wandb test" />
             <Btn
