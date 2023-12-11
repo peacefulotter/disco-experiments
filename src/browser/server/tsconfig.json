@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "rootDir": "..",
-        "rootDirs": [".", "../shared"],
+        "rootDirs": [".", "../core"],
         "baseUrl": "./",
         "esModuleInterop": true,
         "module": "esnext",
@@ -28,11 +28,11 @@
         ],
         "paths": {
             "@/*": ["./*"],
-            "~/*": ["../../shared/*"]
+            "~/*": ["../../core/*"]
         }
     },
     "include": [
-        "../../shared/**/*.ts",
+        "../../core/**/*.ts",
         "./**/*.ts",
         "./**/*.js",
         "../../*.ts",

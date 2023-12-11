@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "rootDir": "..",
-        "rootDirs": [".", "../shared", "../gpt-tfjs"],
+        "rootDirs": [".", "../core", "../gpt-tfjs"],
         "lib": ["ESNext"],
         "module": "esnext",
         "target": "esnext",
@@ -28,14 +28,14 @@
         ],
         "paths": {
             "@/*": ["./*"],
-            "~/*": ["../shared/*"],
+            "~/*": ["../core/*"],
             "#/gpt-tfjs": ["../gpt-tfjs"]
         }
     },
     "include": [
         "**/*.ts",
         "decs.d.ts",
-        "../shared/**/*.ts",
+        "../core/**/*.ts",
         "../gpt-tfjs/**/*.js"
     ],
     "exclude": ["node_modules"]

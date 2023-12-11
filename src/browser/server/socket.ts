@@ -3,8 +3,8 @@ import { Server } from './types.js'
 import {
     getDatasetFile,
     getIteratorDatasetFromFile,
-} from '../../shared/dataset-node.js'
-import config from '../../shared/config.js'
+} from '../../core/dataset-node.js'
+import config from '../../core/config.js'
 import { IncomingMessage } from 'http'
 
 const dummyUrl = 'http://localhost:3001' // can be anything as long as it's a valid URL

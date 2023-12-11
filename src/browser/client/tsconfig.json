@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "rootDir": "../..",
-        "rootDirs": [".", "../../shared", "../../gpt-tfjs"],
+        "rootDirs": [".", "../../core", "../../gpt-tfjs"],
         "target": "es5",
         "lib": ["dom", "dom.iterable", "esnext"],
         "allowJs": true,
@@ -24,7 +24,7 @@
         ],
         "paths": {
             "@/*": ["./*"],
-            "~/*": ["../../shared/*"],
+            "~/*": ["../../core/*"],
             "#/gpt-tfjs": ["../../gpt-tfjs"]
         }
     },
@@ -34,7 +34,7 @@
         "**/*.tsx",
         ".next/types/**/*.ts",
         "decs.d.ts",
-        "../../shared/**/*.ts"
+        "../../core/**/*.ts"
     ],
     "exclude": ["node_modules"]
 }
