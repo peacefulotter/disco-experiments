@@ -16,12 +16,13 @@
 │   │   └── train.ts # Training script calling the training function from core/train.ts
 │   ├── pytorch # Pytorch version
 │   │   ├── llm-baselines # Clone of the llm-baselines repo, with some minor modifications, mainly to use the config.py file
-│   │   │   └── run.sh # Starts training with the config provided in src/core/config.py
+│   │   │   └── run.sh # Starts training with the config provided in src/core/config.json
 │   │   └── minGPT # Clone of the minGPT repo, with some minor modifications, mainly to use the config.py file
-|   |   |   └── run.sh # Starts training with the config provided in src/core/config.py
+|   |   |   └── run.sh # Starts training with the config provided in src/core/config.json
 │   └── core # Core folder containing the shared scripts between the browser and node versions
-│       ├── config.py # Python version of config.ts
-│       ├── config.ts # Main config file for the model, training, and more
+│       ├── config.json # Main config file for picking the model and training parameters
+│       ├── config.py # Importing the config.json file and exposing it to python apps
+│       ├── config.ts # Importing the config.json file and exposing it to js/ts apps
 │       ├── dataset-node.ts # Dataset implementation for Node, using the filesystem to stream read the dataset
 │       ├── dataset.ts # Dataset implementation for the browser, transforming token arrays into a tf.data.Dataset
 │       ├── evaluate.ts # Evaluation function for the model
@@ -37,8 +38,7 @@
 
 # Setup
 
-Feel free to have a look at `./src/core/config.ts` which is a file shared between the browser and node versions. It is the main config file where you can change lots of parameters regarding the model, the training, and more.
-If you are planning to run the python version provided under `./src/gpt-pytorch`, then you will need to convert this typescript file to a python file. This can be done easily here: https://www.codeconvert.ai/typescript-to-python-converter, save it under `./src/core/config.py` (already provided for the default config.ts)
+Feel free to have a look at `./src/core/config.json` which is a file shared between the browser and node versions. It is the main config file where you can change lots of parameters regarding the model, the training, and more.
 
 # Installation & Setup
 
