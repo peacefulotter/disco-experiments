@@ -3,6 +3,7 @@ import path from 'path'
 import esMain from 'es-main'
 import { readdir } from 'fs/promises'
 import { encode } from 'gpt-tokenizer/model/text-davinci-003'
+import config from './config'
 
 // For ts-node-esm
 import { fileURLToPath } from 'url'
@@ -51,12 +52,11 @@ const preprocessStream = async (
     })
 
 export default async function preprocess(cb?: (tokens: number[]) => void) {
-    const datasetDir = path.join(__dirname, '../..', 'datasets', 'wikitext')
+    const datasetDir = path.join(__dirname, '../..', 'datasets', config.dataset)
     console.log('Preprocessing step located at:', datasetDir)
     const streams = await getFileStreams(datasetDir)
 
     for await (const { file, stream } of streams) {
-        if (!file.includes('valid')) continue
         await preprocessStream(datasetDir, file, stream, cb)
     }
 }

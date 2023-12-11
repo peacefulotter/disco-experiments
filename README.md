@@ -35,14 +35,6 @@
 └── install-wikitext.sh # Installs the wikitext-103-raw dataset under ./datasets/
 ```
 
-# Prerequisites
-
--   Install bun
-    -   visit: https://github.com/oven-sh/bun
--   cuDNN Install
-    -   sudo apt install nvidia-cudnn
-    -   OR see: https://stackoverflow.com/questions/66977227/could-not-load-dynamic-library-libcudnn-so-8-when-running-tensorflow-on-ubun
-
 # Setup
 
 Feel free to have a look at `./src/shared/config.ts` which is a file shared between the browser and node versions. It is the main config file where you can change lots of parameters regarding the model, the training, and more.
@@ -50,17 +42,27 @@ If you are planning to run the python version provided under `./src/gpt-pytorch`
 
 # Installation & Setup
 
+## Prerequisites
+
+-   Install bun
+    -   visit: https://github.com/oven-sh/bun
+-   cuDNN Install
+    -   sudo apt install nvidia-cudnn
+    -   OR see: https://stackoverflow.com/questions/66977227/could-not-load-dynamic-library-libcudnn-so-8-when-running-tensorflow-on-ubun
+
+## Setup
+
 ```sh
 $ git clone
 $ cd disco-experiments/
 $ ./install-wikitext.sh # Installs the wikitext-103-raw dataset
-$ cd ./src/shared/
 $ bun install -g typescript ts-node
+$ cd ./src/shared/
 $ bun install
 $ bun preprocess.ts # Tokenizes the wikitext dataset as a preprocessing step
 ```
 
-### Running on the browser
+## Running on the browser
 
 Start the client:
 
@@ -86,7 +88,7 @@ $ bun run dev
 2. Navigate to `localhost:3000` on your browser.
 3. Click on the "Train webgl" or "Train webgpu" button and check the console for logs.
 
-### Running on Node
+## Running on Node
 
 ```sh
 $ cd ./src/node/
