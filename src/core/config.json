@@ -1,0 +1,23 @@
+{
+    "debug": false,
+    "verbose": false,
+    "modelType": "gpt-nano",
+    "dataset": "wikitext-103",
+    "batchSize": 16,
+    "blockSize": 128,
+    "lr": 0.001,
+    "maxIter": 500,
+    "shuffle": null,
+    "weightDecay": false,
+    "optimizer": "adamw",
+    "gradClip": 1,
+    "scheduler": null,
+    "embdDrop": 0.2,
+    "bias": true,
+    "numWorkers": 0,
+    "vocabSize": 50257,
+    "wandbProject": "disco-gpt-benchmark",
+    "evalFreq": 25,
+    "evalSeqPrefix": "none",
+    "maxEvalBatches": 24
+}

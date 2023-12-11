@@ -5,8 +5,6 @@ import {
     TokenizedSample,
 } from './tfjs-types'
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-
 const tokenizedIterator = (
     tf: any,
     gen: () => AsyncTokenizedGenerator,

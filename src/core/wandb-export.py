@@ -22,8 +22,8 @@ e.g. "python wandb-export.py browser webgpu",
 platform = sys.argv[1]
 backend_name = sys.argv[2]
 
-file_name = f'{backend_name}_{config["wandbName"]}.json'
-path = os.path.join(os.path.dirname(__file__), "checkpoints", file_name)
+file_name = f'{platform}_{backend_name}_{config["wandbName"]}.json'
+path = os.path.join(os.path.dirname(__file__), "wandb", file_name)
 print("Loading file:", path)
 with open(path, "r") as f:
     save = json.load(f)

@@ -1,11 +1,16 @@
 import * as tf from '@tensorflow/tfjs'
-import { configModels } from './config'
 
 export type BrowserBackendName = 'cpu' | 'webgl' | 'webgpu' | 'wasm'
 export type NodeBackendName = 'cpu' | 'wasm' | 'tensorflow'
 export type BackendName = BrowserBackendName | NodeBackendName
 
-export type Models = keyof typeof configModels //, 'gpt2', 'gpt2-medium', 'gpt2-large', 'gpt2-xl']
+export type Model = {
+    nLayer: number
+    nHead: number
+    nEmbd: number
+    vocabSize?: number
+    blockSize?: number
+}
 
 export type EncodedDataset = tf.data.Dataset<tf.TensorContainer>
 // export type Dataset = tf.data.Dataset<{ text: string }>
@@ -27,13 +32,10 @@ export type Callback = (
     iter: number
 ) => Promise<void> | void
 
-export type Config = {
+export type BaseConfig = {
     debug: boolean
     verbose: boolean
-    modelType: Models
-    nLayer: number
-    nHead: number
-    nEmbd: number
+    modelType: string
     dataset: string
     batchSize: number
     blockSize: number
@@ -45,7 +47,6 @@ export type Config = {
     gradClip: number
     scheduler: string | null
     embdDrop: number
-    residDrop: number
     bias: boolean
     numWorkers: number
     vocabSize: number
@@ -53,5 +54,10 @@ export type Config = {
     evalFreq: number
     evalSeqPrefix: string
     maxEvalBatches: number
-    wandbName: string
 }
+
+export type Config = BaseConfig &
+    Model & {
+        residDrop: number
+        wandbName: string
+    }
