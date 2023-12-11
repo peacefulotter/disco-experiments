@@ -1,4 +1,4 @@
-import config from '~/config'
+import getConfig from './config'
 import Wandb from '~/wandb'
 // import wandb from '@wandb/sdk'
 
@@ -44,6 +44,7 @@ export default async function wandbTest() {
     // await fetch("/api/wandb/finish", {
     //   method: "POST",
     // });
+    const config = await getConfig()
     const wandb = new Wandb(config, 'test', 'cpu')
     wandb.log({ v: 0 })
     wandb.log({ v: 1 })

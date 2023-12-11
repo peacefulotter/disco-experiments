@@ -3,8 +3,7 @@ import { model } from '#/gpt-tfjs'
 import Wandb from './wandb'
 import setBackend from './backend'
 import evaluate from './evaluate'
-import config from './config'
-import { BackendName, EncodedDataset } from './tfjs-types'
+import { BackendName, Config, EncodedDataset } from './tfjs-types'
 
 const { GPTLMHeadModel } = model
 
@@ -15,6 +14,7 @@ type DatasetWithCallback = {
 
 export default async function train(
     tf: any,
+    config: Config,
     backendName: BackendName,
     wandb: Wandb,
     getTrainDataset: () => Promise<DatasetWithCallback>,
@@ -33,6 +33,7 @@ export default async function train(
     let time = start
     const cb = async (model: any, loss: number, iter: number) => {
         const payload = {
+            'train/perplexity': Math.exp(loss),
             'train/loss': loss,
             iter,
             mem: tf.memory().numBytes,

@@ -1,5 +1,5 @@
 'use client'
-import { ReactNode } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import * as tf from '@tensorflow/tfjs'
 import '@tensorflow/tfjs-backend-webgpu'
 import '@tensorflow/tfjs-backend-wasm'
@@ -9,9 +9,9 @@ import datasetTest from '@/ml/dataset-test'
 import inferenceTest from '@/ml/inference-test'
 import train from '@/ml/train'
 import wandbTest from '@/ml/wandb-test'
-import config from '~/config'
-import { BrowserBackendName } from '~/tfjs-types'
+import { BrowserBackendName, Config } from '~/tfjs-types'
 import trainTest from '@/ml/train-test'
+import getConfig from '@/ml/config'
 
 setWasmPaths(
     '/api/wasm/' // https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@3.9.0/dist/
@@ -45,7 +45,11 @@ const Btn = ({ callback, name }: { callback: () => void; name: ReactNode }) => {
 
 export default function Home() {
     const backends = tf.engine().backendNames() as BrowserBackendName[]
-    console.log(backends)
+
+    const [config, setConfig] = useState<Config | {}>({})
+    useEffect(() => {
+        getConfig().then(setConfig)
+    }, [])
 
     return (
         <main className="flex flex-col p-12 gap-4">

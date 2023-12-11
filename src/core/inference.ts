@@ -1,5 +1,4 @@
 import { model } from '#/gpt-tfjs'
-import config from './config'
 import { BackendName, Config, EncodedDataset } from './tfjs-types'
 import setBackend from './backend'
 const { GPTLMHeadModel } = model
@@ -67,6 +66,7 @@ type InferenceConfig = Config & {
 
 export default async function inference(
     tf: any,
+    config: Config,
     dataset: EncodedDataset,
     backendName: BackendName
 ) {

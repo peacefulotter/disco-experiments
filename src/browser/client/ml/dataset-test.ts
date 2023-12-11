@@ -1,11 +1,12 @@
 'use client'
 import * as tf from '@tensorflow/tfjs'
 import getDataset from './dataset'
-import config from '~/config'
+import getConfig from './config'
 
 export default async function datasetTest() {
     await tf.ready()
 
+    const config = await getConfig()
     const testConfig = { ...config } //,  blockSize: 8, batchSize: 4
     let { dataset, closeWS } = await getDataset(testConfig, 'train')
     dataset = dataset.batch(testConfig.batchSize)

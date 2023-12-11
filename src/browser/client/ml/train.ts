@@ -2,10 +2,11 @@ import * as tf from '@tensorflow/tfjs'
 import getDataset from './dataset'
 import train from '~/train'
 import Wandb from '~/wandb'
-import config from '~/config'
 import { BrowserBackendName } from '~/tfjs-types'
+import getConfig from './config'
 
 export default async function main(backendName: BrowserBackendName) {
+    const config = await getConfig()
     const getTrainDataset = async () => {
         const { dataset, closeWS } = await getDataset(config, 'train')
         return { dataset, onEnd: closeWS }
@@ -20,5 +21,5 @@ export default async function main(backendName: BrowserBackendName) {
 
     const wandb = new Wandb(config, 'browser', backendName)
 
-    await train(tf, backendName, wandb, getTrainDataset, getEvalDataset)
+    await train(tf, config, backendName, wandb, getTrainDataset, getEvalDataset)
 }

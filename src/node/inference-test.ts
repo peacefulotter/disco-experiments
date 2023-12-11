@@ -6,6 +6,6 @@ import inference from '~/inference'
 async function main() {
     const backendName = 'tensorflow'
     const dataset = await getDataset(config, 'valid')
-    inference(tf, dataset, backendName)
+    inference(tf, config, dataset, backendName)
 }
 main()

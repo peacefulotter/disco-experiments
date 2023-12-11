@@ -20,7 +20,7 @@ export default async function main(backendName: NodeBackendName) {
 
     const wandb = new WandbNode(config, 'node', backendName)
 
-    await train(tf, backendName, wandb, getTrainDataset, getEvalDataset)
+    await train(tf, config, backendName, wandb, getTrainDataset, getEvalDataset)
 }
 
 const isBackendName = (name: string): name is NodeBackendName =>

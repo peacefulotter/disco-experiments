@@ -2,7 +2,7 @@
     "compilerOptions": {
         "rootDir": "../..",
         "rootDirs": [".", "../../core", "../../gpt-tfjs"],
-        "target": "es5",
+        "target": "esnext",
         "lib": ["dom", "dom.iterable", "esnext"],
         "allowJs": true,
         "skipLibCheck": true,

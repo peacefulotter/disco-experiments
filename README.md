@@ -42,19 +42,24 @@ Feel free to have a look at `./src/core/config.json` which is a file shared betw
 
 # Installation & Setup
 
+Everything has been tested under Ubuntu 22.04.3 LTS (jammy), kernel 6.5.0-1009-oem
+
 ## Prerequisites
 
--   Install nvm
-    -   visit: https://github.com/nvm-sh/nvm#installing-and-updating
--   Install bun
-    -   visit: https://github.com/oven-sh/bun
--   cuDNN Install
+-   Python
+    -   Python 3 installed (tested on 3.10.12) and pip
+-   NVM
+    -   install: https://github.com/nvm-sh/nvm#installing-and-updating
+-   Bun
+    -   install: https://github.com/oven-sh/bun
+-   cuDNN (optional, I think)
     -   sudo apt install nvidia-cudnn
     -   OR see: https://stackoverflow.com/questions/66977227/could-not-load-dynamic-library-libcudnn-so-8-when-running-tensorflow-on-ubun
 
 ## Setup
 
 ```sh
+$ pip install wandb # Install wandb package to export training stats to WandB
 $ nvm install 18 # Set node version to 18.x
 $ git clone
 $ cd disco-experiments/

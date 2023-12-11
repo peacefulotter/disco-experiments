@@ -41,7 +41,6 @@ export type BaseConfig = {
     blockSize: number
     lr: number
     maxIter: number
-    shuffle: true | 'batch' | number
     weightDecay: number | false
     optimizer: string
     gradClip: number
@@ -58,6 +57,7 @@ export type BaseConfig = {
 
 export type Config = BaseConfig &
     Model & {
+        shuffle: true | 'batch' | number // only NaN works in our case
         residDrop: number
         wandbName: string
     }
