@@ -23,9 +23,6 @@
         "isolatedModules": true,
         "incremental": true,
         "checkJs": false,
-        "types": [
-            "bun-types" // add Bun global
-        ],
         "paths": {
             "@/*": ["./*"],
             "~/*": ["../core/*"],

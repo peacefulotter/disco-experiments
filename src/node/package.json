@@ -1,15 +1,16 @@
 {
   "name": "gpt-tfjs-node-2",
-  "devDependencies": {
-    "bun-types": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  },
   "type": "module",
   "dependencies": {
     "@tensorflow/tfjs-backend-wasm": "^4.13.0",
     "@tensorflow/tfjs-node": "^4.13.0",
     "@tensorflow/tfjs-node-gpu": "^4.13.0"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.0.0",
+    "@types/node": "^20.10.8"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
   }
 }

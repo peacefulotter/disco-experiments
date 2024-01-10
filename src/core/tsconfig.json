@@ -4,7 +4,7 @@
         "rootDirs": [".", "../gpt-tfjs"],
         "lib": ["ESNext"],
         "module": "esnext",
-        "target": "esnext",
+        "target": "es5",
         "moduleResolution": "bundler",
         "moduleDetection": "force",
         "resolveJsonModule": true,
@@ -19,9 +19,6 @@
         "allowSyntheticDefaultImports": true,
         "forceConsistentCasingInFileNames": true,
         "allowJs": true,
-        "types": [
-            "bun-types" // add Bun global
-        ],
         "paths": {
             "@/*": ["./*"],
             "#/gpt-tfjs": ["../gpt-tfjs"]
