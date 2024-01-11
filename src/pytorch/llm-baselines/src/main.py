@@ -51,7 +51,7 @@ def main(args):
     args.n_head = train_config["nHead"]
     args.n_embd = train_config["nEmbd"]
     args.n_layer = train_config["nLayer"]
-    args.dropout = train_config["embdDrop"]
+    args.dropout = train_config["dropout"]
     args.bias = train_config["bias"]
     args.dataset = train_config["dataset"]
     args.scheduler = (
@@ -69,7 +69,10 @@ def main(args):
     args.acc_steps = 1
     args.wandb = True
 
-    exp_name = "llm-baseline_" + config.device + "_" + train_config["wandbName"]
+    platform = train_config["platform"]
+    gpu = train_config["gpu"]
+    model_type = train_config["modelType"]
+    exp_name = f"exp_{platform}_{gpu}_{model_type}"
 
     torch.backends.cuda.matmul.allow_tf32 = (
         True  # allows us to make sure we're able to use tensorfloat32 during training
