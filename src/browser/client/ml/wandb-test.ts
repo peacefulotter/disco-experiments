@@ -17,13 +17,12 @@ export default async function wandbTest() {
     // wandb.log({acc: 0.9, loss: 0.1});
     // wandb.log({acc: 0.91, loss: 0.09});
     // await wandb.finish();
-    // const prefix = "test"
     // const date = new Date().getDate()
     // const config = await getConfig();
     // console.log(typeof window);
     // // const run = await wandb.init({
     // //   project: config.wandbProject,
-    // //   name: `${prefix}_${config.wandbName}`,
+    // //   name: "test",
     // //   config: { ...config, date },
     // // });
     // await fetch("/api/wandb/init", {
@@ -45,7 +44,7 @@ export default async function wandbTest() {
     //   method: "POST",
     // });
     const config = await getConfig()
-    const wandb = new Wandb(config, 'test', 'cpu')
+    const wandb = new Wandb(config)
     wandb.log({ v: 0 })
     wandb.log({ v: 1 })
     try {

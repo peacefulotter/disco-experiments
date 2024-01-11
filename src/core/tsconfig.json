@@ -2,9 +2,9 @@
     "compilerOptions": {
         "rootDir": "..",
         "rootDirs": [".", "../gpt-tfjs"],
-        "lib": ["ESNext"],
+        "lib": ["ESNext", "dom"],
         "module": "esnext",
-        "target": "es5",
+        "target": "esnext",
         "moduleResolution": "bundler",
         "moduleDetection": "force",
         "resolveJsonModule": true,
@@ -24,6 +24,6 @@
             "#/gpt-tfjs": ["../gpt-tfjs"]
         }
     },
-    "include": ["**/*.ts", "../gpt-tfjs/**/*.js"],
+    "include": ["**/*.ts", "../gpt-tfjs/**/*.ts"],
     "exclude": ["node_modules"]
 }

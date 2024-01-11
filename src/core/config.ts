@@ -15,15 +15,16 @@ const readJson = async (filename: string) => {
 
 const configModels = await readJson('models.json')
 const baseConfig = (await readJson('config.json')) as BaseConfig
-const { modelType, dataset, batchSize, blockSize, lr, maxIter } = baseConfig
+const { modelType } = baseConfig
 const model = configModels[modelType] as Model
 
 const config: Config = {
     ...baseConfig,
     ...model,
-    shuffle: NaN,
-    residDrop: baseConfig.embdDrop,
-    wandbName: `${modelType}_${dataset}_bs=${batchSize}_seq=${blockSize}_lr=${lr}_iter=${maxIter}`,
+    platform:
+        typeof window !== 'undefined' && typeof window.document !== 'undefined'
+            ? 'browser'
+            : 'node',
 } as const
 
 export { configModels }

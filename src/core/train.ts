@@ -1,11 +1,9 @@
-import { model } from '#/gpt-tfjs'
+import { model as gpt, train as gptTrain } from '#/gpt-tfjs'
 
 import Wandb from './wandb'
 import setBackend from './backend'
 import evaluate from './evaluate'
 import { BackendName, Config, EncodedDataset } from './tfjs-types'
-
-const { GPTLMHeadModel } = model
 
 type DatasetWithCallback = {
     dataset: EncodedDataset
@@ -27,7 +25,7 @@ export default async function train(
     console.log(config)
 
     console.log('Running', config.modelType)
-    const gpt = GPTLMHeadModel(config)
+    const model = new gpt.GPTLMHeadModel(config)
 
     const start = Date.now()
     let time = start
@@ -53,10 +51,7 @@ export default async function train(
         time = Date.now()
     }
 
-    await gpt.train(trainDataset, {
-        ...config,
-        callbacks: [cb],
-    })
+    await gptTrain(model, trainDataset, config, cb)
 
     await wandb.finish()
 

@@ -2,30 +2,22 @@
     "gpt2": {
         "nLayer": 12,
         "nHead": 12,
-        "nEmbd": 768,
-        "vocabSize": 50257,
-        "blockSize": 1024
+        "nEmbd": 768
     },
     "gpt2-medium": {
         "nLayer": 24,
         "nHead": 16,
-        "nEmbd": 1024,
-        "vocabSize": 50257,
-        "blockSize": 1024
+        "nEmbd": 1024
     },
     "gpt2-large": {
         "nLayer": 36,
         "nHead": 20,
-        "nEmbd": 1280,
-        "vocabSize": 50257,
-        "blockSize": 1024
+        "nEmbd": 1280
     },
     "gpt2-xl": {
         "nLayer": 48,
         "nHead": 25,
-        "nEmbd": 1600,
-        "vocabSize": 50257,
-        "blockSize": 1024
+        "nEmbd": 1600
     },
     "gpt-mini": {
         "nLayer": 6,

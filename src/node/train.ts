@@ -7,7 +7,7 @@ import { getDataset } from '~/dataset-node'
 import config from '~/config'
 import train from '~/train'
 import { NodeBackendName } from '~/tfjs-types'
-import WandbNode from '~/wandb-node'
+import { WandbNode } from '~/wandb-node'
 
 setWasmPaths('./node_modules/@tensorflow/tfjs-backend-wasm/dist/')
 
@@ -18,7 +18,13 @@ export default async function main(backendName: NodeBackendName) {
     const getTrainDataset = getDatasetRoutine('train')
     const getEvalDataset = getDatasetRoutine('valid')
 
-    const wandb = new WandbNode(config, 'node', backendName)
+    const wandb = new WandbNode(config)
+
+    // const wandb = new Wandb({
+    //     platform: typeof window !== undefined ? 'browser' : 'node',
+    //     gpu: 'nvidia-4070-ti',
+    //     model: config.modelType,
+    // })
 
     await train(tf, config, backendName, wandb, getTrainDataset, getEvalDataset)
 }

@@ -30,7 +30,7 @@
 │       ├── preprocess.ts # Preprocessing script for the wikitext dataset (other datasets can be added)
 │       ├── train.ts # Training function for the model, logging stats every iteration and saving them to WandB
 │       ├── wandb-export.py # Script for exporting the training stats to WandB (since the npm package is broken)
-│       ├── wandb-node.ts # WandbNode class inheriting from WandB, for writing the saved stats to a file
+│       ├── wandb-node.ts # wandb utility function to write the saved stats to a file
 │       └── wandb.ts # WandB class defining the interface for saving the training stats (init, log, finish)
 ├── chrome-webgpu.sh # Starts chrome with webgpu enabled
 └── install-wikitext.sh # Installs the wikitext-103-raw dataset under ./datasets/

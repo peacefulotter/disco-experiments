@@ -1,21 +1,21 @@
-const tf = require('@tensorflow/tfjs')
+import * as tf from '@tensorflow/tfjs'
 
-function convertMinGPTConfig(config) {
+function convertMinGPTConfig(config: any) {
     const mapping = {
-        'n_embd': 'nEmbd',
-        'n_head': 'nHead',
-        'n_layer': 'nLayer',
-        'block_size': 'blockSize',
-        'vocab_size': 'vocabSize',
-        'attn_pdrop': 'dropout',
-        'resid_pdrop': 'dropout',
-        'embd_pdrop': 'dropout',
-        'model_type': 'modelType',
+        n_embd: 'nEmbd',
+        n_head: 'nHead',
+        n_layer: 'nLayer',
+        block_size: 'blockSize',
+        vocab_size: 'vocabSize',
+        attn_pdrop: 'dropout',
+        resid_pdrop: 'dropout',
+        embd_pdrop: 'dropout',
+        model_type: 'modelType',
     }
-    const newConfig = {}
+    const newConfig: any = {}
     for (const key in config) {
         if (key in mapping) {
-            newConfig[mapping[key]] = config[key]
+            newConfig[mapping[key as keyof typeof mapping]] = config[key]
         } else {
             newConfig[key] = config[key]
         }
@@ -23,8 +23,8 @@ function convertMinGPTConfig(config) {
     return newConfig
 }
 
-function convertMinGPTWeights(weights) {
-    const newWeights = {}
+function convertMinGPTWeights(weights: any) {
+    const newWeights: any = {}
     for (const wn in weights) {
         const w = weights[wn]
         let wt = tf.tensor(w)
@@ -38,16 +38,13 @@ function convertMinGPTWeights(weights) {
         } else {
             wnNew = wnNew.replace('weight', 'kernel')
             wnNew = wnNew.replace('bias', 'bias')
-        } 
+        }
         if (wnNew.includes('kernel') && wt.shape.length == 2) {
             wt = wt.transpose()
         }
-        newWeights[wnNew] = wt 
+        newWeights[wnNew] = wt
     }
     return newWeights
 }
 
-module.exports = {
-    convertMinGPTConfig,
-    convertMinGPTWeights
-}
+export { convertMinGPTConfig, convertMinGPTWeights }

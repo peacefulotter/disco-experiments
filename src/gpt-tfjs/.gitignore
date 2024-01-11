@@ -1,9 +1,3 @@
-coverage/
 node_modules/
-temp/
-data/
-dist/
-mlruns/
-test.json
-.swp
-package-lock.json
+wandb/*.json
+wandb/wandb/

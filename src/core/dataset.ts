@@ -11,8 +11,8 @@ const tokenizedIterator = (
     vocabSize: number
 ): EncodedDataset => {
     return tf.data.generator(gen as any).map((v: any & TokenizedSample) => ({
-        x: tf.tensor1d(v.x, 'int32'),
-        y: tf.oneHot(v.y, vocabSize),
+        xs: tf.tensor1d(v.xs, 'int32'),
+        ys: tf.oneHot(v.ys, vocabSize),
     }))
 }
 
@@ -35,33 +35,18 @@ export async function getDataset(
             const chunk = await requestNext()
             if (!chunk) break
 
-            // const tokens = []
-            // for (let i = 0; i < chunk.length; i += 2) {
-            //     const low = chunk[i]
-            //     const high = chunk[i + 1]
-            //     const token = toUInt16(low, high)
-            //     tokens.push(token)
-            // }
-
-            // for (let i = 0; i < config.batchSize; i++) {
-            //     const x = tokens.slice(i, i + config.blockSize)
-            //     const y = tokens.slice(i + 1, i + config.blockSize + 1)
-            //     yield { x, y }
-            //     // await sleep(1)
-            // }
-
             for (let i = 0; i < config.batchSize; i++) {
-                const x = []
-                const y = []
+                const xs = []
+                const ys = []
                 for (let j = 0; j < sampleSize; j++) {
                     const idx = (i * sampleSize + j) * 2
                     const low = chunk[idx]
                     const high = chunk[idx + 1]
                     const token = toUInt16(low, high)
-                    if (j < sampleSize - 1) x.push(token)
-                    if (j > 0) y.push(token)
+                    if (j < sampleSize - 1) xs.push(token)
+                    if (j > 0) ys.push(token)
                 }
-                yield { x, y }
+                yield { xs, ys }
             }
         }
     }

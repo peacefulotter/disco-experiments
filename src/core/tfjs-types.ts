@@ -1,4 +1,5 @@
 import * as tf from '@tensorflow/tfjs'
+import { model as gpt } from '#/gpt-tfjs'
 
 export type BrowserBackendName = 'cpu' | 'webgl' | 'webgpu' | 'wasm'
 export type NodeBackendName = 'cpu' | 'wasm' | 'tensorflow'
@@ -13,11 +14,10 @@ export type Model = {
 }
 
 export type EncodedDataset = tf.data.Dataset<tf.TensorContainer>
-// export type Dataset = tf.data.Dataset<{ text: string }>
 
 export type TokenizedSample = {
-    x: number[]
-    y: number[]
+    xs: number[]
+    ys: number[]
 }
 
 export type AsyncTokenizedGenerator = AsyncGenerator<
@@ -35,7 +35,7 @@ export type Callback = (
 export type BaseConfig = {
     debug: boolean
     verbose: boolean
-    modelType: string
+    modelType: gpt.ModelType
     dataset: string
     batchSize: number
     blockSize: number
@@ -43,9 +43,11 @@ export type BaseConfig = {
     maxIter: number
     weightDecay: number | false
     optimizer: string
-    gradClip: number
     scheduler: string | null
+    dropout: number
+    residDrop: number
     embdDrop: number
+    gradientClipNorm: number
     bias: boolean
     numWorkers: number
     vocabSize: number
@@ -53,11 +55,11 @@ export type BaseConfig = {
     evalFreq: number
     evalSeqPrefix: string
     maxEvalBatches: number
+    shuffle: true | 'batch' | number
+    gpu: string
 }
 
 export type Config = BaseConfig &
     Model & {
-        shuffle: true | 'batch' | number // only NaN works in our case
-        residDrop: number
-        wandbName: string
+        platform: string
     }

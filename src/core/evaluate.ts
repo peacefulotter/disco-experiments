@@ -18,21 +18,21 @@ export default async function evaluate(
     while (iteration < config.maxEvalBatches) {
         const next = await iter.next()
         if (next == null) break
-        const { x, y } = next.value
-        const logits = model.apply(x)
+        const { xs, ys } = next.value
+        const logits = model.apply(xs)
 
         // Loss
-        const loss = tf.losses.softmaxCrossEntropy(y, logits)
+        const loss = tf.losses.softmaxCrossEntropy(ys, logits)
         const lossVal = await loss.array()
         total_loss += lossVal
 
         // Accuracy
-        const acc_tensor = tf.metrics.categoricalAccuracy(y, logits)
+        const acc_tensor = tf.metrics.categoricalAccuracy(ys, logits)
         const acc_sum = acc_tensor.sum()
         acc[0] += await acc_sum.array()
         acc[1] += acc_tensor.shape[0] * acc_tensor.shape[1]
 
-        tf.dispose([acc_tensor, acc_sum, loss, logits, x, y])
+        tf.dispose([acc_tensor, acc_sum, loss, logits, xs, ys])
 
         iteration++
     }

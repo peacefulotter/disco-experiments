@@ -19,7 +19,7 @@ export default async function main(backendName: BrowserBackendName) {
         return { dataset: evalDataset, onEnd: evalCloseWs }
     }
 
-    const wandb = new Wandb(config, 'browser', backendName)
+    const wandb = new Wandb(config)
 
     await train(tf, config, backendName, wandb, getTrainDataset, getEvalDataset)
 }

@@ -7,6 +7,7 @@ import { Config } from './tfjs-types'
 
 // For ts-node-esm
 import { fileURLToPath } from 'url'
+import { TOKENIZED_FILE_EXTENSION } from './preprocess'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
@@ -34,7 +35,9 @@ export async function getDatasetFile(config: Config, split: string) {
     console.log('Preprocessed dataset located at:', datasetDir)
 
     const files = await readdir(datasetDir)
-    const file = files.filter((f) => f.endsWith('pp') && f.includes(split))[0]
+    const file = files.filter(
+        (f) => f.endsWith(TOKENIZED_FILE_EXTENSION) && f.includes(split)
+    )[0]
     console.log(
         'Found',
         files.length,
@@ -77,8 +80,11 @@ export async function getDataset(config: Config, split: string) {
     const file = await getDatasetFile(config, split)
     let stream = getIteratorDatasetFromFile(config, file)
     const requestNext = async () => {
-        const { value } = await stream.next()
-        return value
+        const { value } = (await stream.next()) as {
+            value: Buffer
+            done: boolean
+        }
+        return value.toJSON().data
     }
     return getBackboneDataset(tf, config, requestNext)
 }
