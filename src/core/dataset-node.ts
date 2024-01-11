@@ -11,7 +11,10 @@ import { TOKENIZED_FILE_EXTENSION } from './preprocess'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-function getFileStream(config: Config, file: string) {
+export const getDatasetDir = (config: Config) =>
+    path.join(__dirname, '../../', 'datasets', config.dataset)
+
+export function getFileStream(config: Config, file: string) {
     const datasetDir = getDatasetDir(config)
 
     // blockSize to get an initial full x
@@ -26,9 +29,6 @@ function getFileStream(config: Config, file: string) {
         highWaterMark, // set this to seq length * 2 because we store uint16,
     })
 }
-
-const getDatasetDir = (config: Config) =>
-    path.join(__dirname, '../../', 'datasets', config.dataset)
 
 export async function getDatasetFile(config: Config, split: string) {
     const datasetDir = getDatasetDir(config)
@@ -52,7 +52,7 @@ export async function getDatasetFile(config: Config, split: string) {
 export function getIteratorDatasetFromFile(
     config: Config,
     file: string
-): AsyncIterator<Buffer> {
+): AsyncIterator<Buffer, Buffer> {
     const getStream = () => {
         const stream = getFileStream(config, file)
         return {
@@ -78,12 +78,9 @@ export function getIteratorDatasetFromFile(
 
 export async function getDataset(config: Config, split: string) {
     const file = await getDatasetFile(config, split)
-    let stream = getIteratorDatasetFromFile(config, file)
+    const stream = getIteratorDatasetFromFile(config, file)
     const requestNext = async () => {
-        const { value } = (await stream.next()) as {
-            value: Buffer
-            done: boolean
-        }
+        const { value } = await stream.next()
         return value.toJSON().data
     }
     return getBackboneDataset(tf, config, requestNext)

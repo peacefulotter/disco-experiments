@@ -16,7 +16,7 @@ const tokenizedIterator = (
     }))
 }
 
-const toUInt16 = (low: number, high: number) => {
+export const toUInt16 = (low: number, high: number) => {
     low &= 0xff
     high &= 0xff
     return (high << 8) | low
