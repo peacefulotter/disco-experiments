@@ -1,7 +1,6 @@
-import { model } from '#/gpt-tfjs'
+import { model as gpt } from '#/gpt-tfjs'
 import { BackendName, Config, EncodedDataset } from './tfjs-types'
 import setBackend from './backend'
-const { GPTLMHeadModel } = model
 
 function prepareIdx(tf: any, idx: any) {
     tf.tidy(() => {
@@ -26,7 +25,6 @@ function prepareIdx(tf: any, idx: any) {
 }
 
 function generateOnce(tf: any, model: any, idx: any, config: any) {
-    let idxNext
     let timePerToken = performance.now()
     let timePrediction = 0
     tf.tidy(() => {
@@ -44,16 +42,13 @@ function generateOnce(tf: any, model: any, idx: any, config: any) {
             .slice([0, idx.shape[1] - 1, 0])
             .reshape([logits.shape[0], logits.shape[2]])
             .div(tf.scalar(config.temperature))
-        // TODO: topK sampling
         // apply softmax to convert logits to (normalized) probabilities
         const probs = logitsScaled.softmax(-1)
-        idxNext = probs.argMax(-1)
-        idxNext = idxNext.expandDims(1)
-        tf.keep(idxNext)
+        const idxNext = probs.argMax(-1).expandDims(1)
+        tf.dispose([logits, logitsScaled, probs, idxNext])
     })
     timePerToken = performance.now() - timePerToken
     return {
-        idxNext,
         timePerToken,
         timePrediction,
     }
@@ -72,43 +67,40 @@ export default async function inference(
 ) {
     await setBackend(tf, backendName)
 
-    const gpt = GPTLMHeadModel(config)
-
-    const maxNewTokens = 20
+    const inferenceIterations = 200
+    const model = gpt.GPT(config)
     const params: InferenceConfig = {
         maxLength: 32,
         temperature: 1,
         ...config,
         batchSize: 16,
     }
-    let stats: [number, number, number] = [0, 0, 0]
+    const stats: [number, number, number] = [0, 0, 0]
 
     const iter = await dataset.iterator()
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < inferenceIterations; i++) {
         const { value } = await iter.next()
-        const { x: tokens } = value
+        const { xs: tokens } = value
         const idx = prepareIdx(tf, tokens)
-        for (let step = 0; step < maxNewTokens; step++) {
-            const { timePerToken, timePrediction } = generateOnce(
-                tf,
-                gpt.model,
-                idx,
-                params
-            )
-            console.log(
-                `prediction time: ${timePrediction}, time per token: ${timePerToken}`
-            )
-            stats[0] += timePrediction
-            stats[1] += timePerToken
-            stats[2] += 1
-            await new Promise((r) => setTimeout(r, 1))
-        }
+        const { timePerToken, timePrediction } = generateOnce(
+            tf,
+            model,
+            idx,
+            params
+        )
+        stats[0] += timePrediction
+        stats[1] += timePerToken
+        stats[2] += 1
+        await new Promise((r) => setTimeout(r, 1))
     }
 
     console.log(
-        'Avg: prediction time:',
+        'Over',
+        inferenceIterations,
+        'iterations:\nAvg prediction time:',
         stats[0] / stats[2],
-        ', time per token:',
-        stats[1] / stats[2]
+        'ms\nTime per token:',
+        stats[1] / stats[2],
+        'ms'
     )
 }

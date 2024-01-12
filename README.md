@@ -108,6 +108,10 @@ $ bun install
 $ bun train.ts {backendname} # run training, backendname=cpu|tensorflow|wasm
 ```
 
+# Notes
+
+-   CPU backend is way too slow because it is single threaded only (as far as I know). Multi threaded is possible using the WebAssembly backend but it does not work as of now. The backend is supported in the code and should work fine but a TFJS error is raised during training: `Uncaught (in promise) Error: Kernel 'UnsortedSegmentSum' not registered for backend 'wasm'`. From my understanding, some layers of GPT is not yet supported for this backend. The issue has been reported under: https://github.com/tensorflow/tfjs/issues/8082
+
 ## WandB
 
 The pytorch tests work with wandb, but since the @wandb/sdk npm package is broken, the training statistics from **both** the browser and node versions need to be exported to wandb manually. A script has been made for this:
@@ -137,3 +141,16 @@ $ python3 wandb-export.py {platform} {backendname} # platform=browser|node, back
     -
 
 # Results
+
+Benchmarks are run for the gpt-nano model on an Nvidia 4070 Ti.
+
+### Training
+
+### Inference
+
+For inference, we consider the time it takes for the model to predict the next token in ms. An average is taken over 200 iterations.
+
+-   browser
+    -   WebGL: 5ms
+    -   WebGPU: 6ms
+    -   CPU: 1000ms
