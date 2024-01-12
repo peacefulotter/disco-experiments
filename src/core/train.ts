@@ -22,6 +22,7 @@ export default async function train(
 
     const { dataset: trainDataset, onEnd: onTrainEnd } = await getTrainDataset()
 
+    config.backend = backendName
     console.log(config)
 
     const model = new gpt.GPTLMHeadModel(config)

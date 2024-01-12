@@ -15,7 +15,7 @@ export const exportWandb = async (save: WandbSave) => {
 
     const p = path.join(
         dir,
-        `exp_${save.init.config.platform}_${save.init.config.gpu}_${save.init.config.modelType}.json`
+        `exp_${save.init.config.platform}_${save.init.config.backend}_${save.init.config.gpu}_${save.init.config.modelType}.json`
     )
     await fs.writeFile(p, json, 'utf-8')
 }
