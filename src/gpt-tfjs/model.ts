@@ -665,6 +665,7 @@ type GPTConfig = {
     shuffle?: boolean | number | 'batch'
     lr?: number
     weightDecay?: boolean | number
+    gradientClipNorm?: number
     verbose?: boolean
     bias?: boolean
     debug?: boolean

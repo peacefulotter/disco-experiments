@@ -24,7 +24,6 @@ export default async function train(
 
     console.log(config)
 
-    console.log('Running', config.modelType)
     const model = new gpt.GPTLMHeadModel(config)
 
     const start = Date.now()

@@ -1,3 +1,4 @@
+'use client'
 import * as tf from '@tensorflow/tfjs'
 import getDataset from './dataset'
 import train from '~/train'

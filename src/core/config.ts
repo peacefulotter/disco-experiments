@@ -21,10 +21,8 @@ const model = configModels[modelType] as Model
 const config: Config = {
     ...baseConfig,
     ...model,
-    platform:
-        typeof window !== 'undefined' && typeof window.document !== 'undefined'
-            ? 'browser'
-            : 'node',
+    platform: 'node',
+    backend: 'cpu',
 } as const
 
 export { configModels }

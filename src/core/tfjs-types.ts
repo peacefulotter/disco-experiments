@@ -61,5 +61,6 @@ export type BaseConfig = {
 
 export type Config = BaseConfig &
     Model & {
-        platform: string
+        platform: 'browser' | 'node'
+        backend: BackendName
     }

@@ -1,3 +1,4 @@
+'use client'
 import getConfig from './config'
 import Wandb from '~/wandb'
 // import wandb from '@wandb/sdk'

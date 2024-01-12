@@ -1,5 +1,8 @@
 import * as tf from '@tensorflow/tfjs'
-import { model } from '#/gpt-tfjs'
+import { model, train } from '#/gpt-tfjs'
+import { BrowserBackendName } from '~/tfjs-types'
+import setBackend from '~/backend'
+import getConfig from './config'
 const { GPTLMHeadModel } = model
 
 function l2Loss(tensor: tf.Tensor) {
@@ -95,9 +98,17 @@ const ownTest = async () => {
     y.dispose()
 }
 
-export default async function trainTest() {
-    await tf.setBackend('wasm')
-    await tf.ready()
+export default async function trainTest(backendName: BrowserBackendName) {
+    await setBackend(tf, backendName)
+
+    const baseConfig = await getConfig()
+    const config = {
+        ...baseConfig,
+        batchSize: 2,
+        blockSize: 5,
+        vocabSize: 3,
+        modelType: 'gpt-nano',
+    } as const
 
     async function* generator() {
         while (true) {
@@ -109,18 +120,11 @@ export default async function trainTest() {
         }
     }
 
-    const config = {
-        batchSize: 2,
-        blockSize: 5,
-        vocabSize: 3,
-        modelType: 'gpt-nano',
-    }
-
     const dataset = tf.data.generator(generator as any).map((v: any) => ({
         x: tf.tensor1d(v.x, 'int32'),
         y: tf.oneHot(v.y, config.vocabSize),
     }))
 
-    const gpt = GPTLMHeadModel(config)
-    await gpt.train(dataset, config)
+    const gpt = new GPTLMHeadModel(config)
+    await train(gpt, dataset, config)
 }

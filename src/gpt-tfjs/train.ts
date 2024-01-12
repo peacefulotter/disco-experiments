@@ -8,23 +8,18 @@ export async function train(
     config: GPTConfig,
     callback?: (model: any, loss: number, iter: number) => void | Promise<void>
 ): Promise<void> {
-    // if (config.shuffle === true) {
-    //     ds = ds.shuffle(config.batchSize * 10)
-    // } else if (config.shuffle === 'batch') {
-    //     ds = ds.shuffle(config.batchSize)
-    // } else if (config.shuffle && !isNaN(config.shuffle)) {
-    //     ds = ds.shuffle(config.shuffle)
-    // }
-    ds = ds.batch(config.batchSize)
+    console.log('Starting training on', tf.getBackend(), 'backend')
 
-    var includeInWeightDecay: string[] = []
-    var excludeFromWeightDecay: string[] = []
+    ds = ds.batch(config.batchSize)
 
     if (config.weightDecay === true) {
         config.weightDecay = 1e-4
     }
     let opt: tf.Optimizer
     if (config.weightDecay) {
+        const includeInWeightDecay: string[] = []
+        const excludeFromWeightDecay: string[] = []
+
         model.getNamedWeights().forEach((v: any) => {
             if (
                 v.name.includes('bias') ||
@@ -68,12 +63,15 @@ export async function train(
 
         // Calculates loss, computes gradients and applies them
         const loss = tf.tidy(() => {
-            let { grads, value: loss } = opt.computeGradients(() => {
+            const { grads, value: loss } = opt.computeGradients(() => {
                 const logits = model.apply(xs)
                 const loss = tf.losses.softmaxCrossEntropy(ys, logits)
                 return loss as tf.Scalar
             })
-            let gradsClipped = clipByGlobalNormObj(grads, 1)
+            const gradsClipped = clipByGlobalNormObj(
+                grads,
+                config.gradientClipNorm ?? 1
+            )
             opt.applyGradients(gradsClipped)
             return loss
         })
