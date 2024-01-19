@@ -1,14 +1,14 @@
-import { Config, EncodedDataset } from './tfjs-types'
+import { GPTConfigWithWandb } from '.'
+import { TokenizedDataset } from './tfjs-types'
 
 export default async function evaluate(
     tf: any,
     model: any,
-    dataset: EncodedDataset,
-    config: Config
+    dataset: TokenizedDataset,
+    config: GPTConfigWithWandb
 ) {
     console.log('Evaluating..')
 
-    dataset = dataset.batch(config.batchSize)
     const iter = await dataset.iterator()
 
     let total_loss = 0

@@ -8,7 +8,7 @@ import getConfig from './config'
 
 export default async function inferenceTest(backendName: BrowserBackendName) {
     const config = await getConfig()
-    let { dataset, closeWS } = await getDataset(config, 'valid')
+    let { dataset, onEnd } = await getDataset(config, 'valid')
     await inference(tf, config, dataset, backendName)
-    closeWS()
+    onEnd?.()
 }

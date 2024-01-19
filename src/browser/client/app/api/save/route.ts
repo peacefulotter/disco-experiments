@@ -1,5 +1,5 @@
 import { exportWandb } from '~/wandb-node'
-import { WandbSave } from '~/wandb'
+import { WandbSave } from '../../../wandb'
 
 export async function POST(req: Request) {
     const { save } = (await req.json()) as {

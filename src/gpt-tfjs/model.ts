@@ -599,34 +599,12 @@ async function generate(model: any, idx: any, conf: any, callback: any) {
     return idxArr
 }
 
-/**
- * tfjs does not export LazyIterator and Dataset...
- */
-declare abstract class LazyIterator<T> {
-    abstract next(): Promise<IteratorResult<T>>
-}
-
-declare abstract class Dataset<T> {
-    abstract iterator(): Promise<LazyIterator<T>>
-    size: number
-}
-
 class GPTModel extends tf.LayersModel {
     constructor(protected readonly config: any) {
         const gpt = GPT(config)
         const { inputs, outputs, name } = gpt
         super({ inputs, outputs, name })
         Object.assign(this, gpt)
-    }
-
-    async fitDataset<T>(
-        dataset: Dataset<T>,
-        args: tf.ModelFitDatasetArgs<T>
-    ): Promise<tf.History> {
-        console.log('=== GPTModel custom train function ===')
-        const config = { ...this.config, ...args }
-        await train(this, dataset, config)
-        return {} as tf.History
     }
 
     async load(modelPath: any) {
@@ -648,39 +626,6 @@ class GPTLMHeadModel extends GPTModel {
     }
 }
 
-type ModelType =
-    | 'gpt2'
-    | 'gpt2-medium'
-    | 'gpt2-large'
-    | 'gpt2-xl'
-    | 'gpt-mini'
-    | 'gpt-micro'
-    | 'gpt-nano'
-
-type GPTConfig = {
-    batchSize: number
-    epochs?: number
-    maxIter?: number
-    blockSize?: number
-    shuffle?: boolean | number | 'batch'
-    lr?: number
-    weightDecay?: boolean | number
-    gradientClipNorm?: number
-    verbose?: boolean
-    bias?: boolean
-    debug?: boolean
-    dropout?: number
-    residDrop?: number
-    embdDrop?: number
-    nLayer?: number
-    nHead?: number
-    nEmbd?: number
-    vocabSize?: number
-    tokEmb?: boolean
-    lmHead?: boolean
-    modelType: ModelType
-}
-
 export {
     GELU,
     CausalSelfAttention,
@@ -690,8 +635,6 @@ export {
     GPT,
     GPTModel,
     GPTLMHeadModel,
-    type ModelType,
-    type GPTConfig,
     generate,
     generateSync,
 }

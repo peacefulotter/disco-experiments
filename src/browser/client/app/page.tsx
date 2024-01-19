@@ -1,96 +1,115 @@
 'use client'
-import { ReactNode, useEffect, useState } from 'react'
 import * as tf from '@tensorflow/tfjs'
-import '@tensorflow/tfjs-backend-webgpu'
-import '@tensorflow/tfjs-backend-wasm'
-import { setWasmPaths } from '@tensorflow/tfjs-backend-wasm'
-
-import datasetTest from '@/ml/dataset-test'
-import inferenceTest from '@/ml/inference-test'
-import train from '@/ml/train'
-import wandbTest from '@/ml/wandb-test'
-import { BrowserBackendName, Config } from '~/tfjs-types'
-import trainTest from '@/ml/train-test'
+import { useEffect, useState } from 'react'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Separator } from '@/components/ui/separator'
+import * as gpt from '#/gpt-tfjs'
+import { GPTConfigWithWandb } from '#/gpt-tfjs'
 import getConfig from '@/ml/config'
+import datasetTest from '@/ml/dataset-test'
+import main from '@/ml/train'
 
-setWasmPaths(
-    '/api/wasm/' // https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@3.9.0/dist/
-    // true
-)
-
-// import Chart from "@/components/Chart";
-// import Combobox from "@/components/Combobox";
-// const profiles = [
-//   {value: 'iter', text: 'Iteration'},
-//   {value: 'loss', text: 'Loss'},
-//   {value: 'time', text: 'Time'},
-//   {value: 'mem', text: 'Memory'}
-// ]
-//  <div className='flex gap-4'>
-//     <Combobox options={profiles} param={'x'} />
-//     <Combobox options={profiles} param={'y'} />
-// </div>
-// <Chart data={data.samples} />
-
-const Btn = ({ callback, name }: { callback: () => void; name: ReactNode }) => {
-    return (
-        <button
-            onClick={callback}
-            className="flex-1 px-8 py-3 bg-neutral-800 rounded capitalize hover:bg-neutral-700 transition-colors"
-        >
-            {name}
-        </button>
-    )
-}
+const DATASET_NAMES = ['wikitext-103', 'tiny-shakespeare'] as const
+type DatasetName = (typeof DATASET_NAMES)[number]
 
 export default function Home() {
-    const backends = tf.engine().backendNames() as BrowserBackendName[]
+    const [datasetName, setDatasetName] = useState<DatasetName>('wikitext-103')
+    const [config, setConfig] = useState<GPTConfigWithWandb>()
+    const [availableBackends, setAvailableBackends] = useState<string[]>([])
+    const [backendName, setBackendName] = useState<string>('cpu')
 
-    const [config, setConfig] = useState<Config | {}>({})
     useEffect(() => {
-        getConfig().then(setConfig)
+        getConfig().then((c) => setConfig(gpt.getConfig(c)))
+        setAvailableBackends(tf.engine().backendNames())
+        setBackend(tf.getBackend())
     }, [])
 
-    return (
-        <main className="flex flex-col p-12 gap-4">
-            <div>
-                Backend availables:&nbsp;
-                {backends.join(', ')}
-            </div>
-            <div className="flex items-center gap-5">
-                <p className="font-bold">Train: </p>
-                <div className="flex gap-2 w-full">
-                    {backends.map((backend) => (
-                        <Btn
-                            key={`train-${backend}`}
-                            callback={() => train(backend)}
-                            name={backend}
-                        />
-                    ))}
-                </div>
-            </div>
+    const datasetBenchmark = async () => {
+        datasetTest()
+    }
 
-            <div className="flex items-center gap-5">
-                <p className="font-bold">Inference: </p>
-                <div className="flex gap-2 w-full">
-                    {backends.map((backend) => (
-                        <Btn
-                            key={`inference-${backend}`}
-                            callback={() => inferenceTest(backend)}
-                            name={backend}
-                        />
-                    ))}
+    const startTraining = async () => {
+        await main(backendName as any).catch(console.error)
+    }
+
+    // util function to properly set the backend
+    // TODO: Move this to core as well?
+    const setBackend = async (backendName: string) => {
+        await tf.setBackend(backendName)
+        await tf.ready()
+
+        const tfBackend = tf.getBackend()
+        if (tfBackend !== backendName) {
+            throw new Error('backend not properly set, got: ' + tfBackend)
+        }
+
+        console.log('Backend set to:', tfBackend)
+        setBackendName(tfBackend)
+    }
+
+    console.log(backendName, datasetName)
+
+    return (
+        <main className="flex p-24 gap-8">
+            <pre className="bg-slate-800 rounded p-4 max-w-min">
+                {JSON.stringify(config, undefined, 4)}
+            </pre>
+            <div className="flex flex-col gap-8">
+                <div className="flex justify-between items-center gap-4 bg-slate-800 rounded py-2 px-8 h-fit">
+                    Backend:
+                    <Tabs value={backendName} onValueChange={setBackend}>
+                        <TabsList className="gap-4">
+                            {availableBackends.map((backendName, i) => (
+                                <TabsTrigger
+                                    className="hover:!bg-slate-900"
+                                    value={backendName}
+                                    key={`btn-${i}`}
+                                >
+                                    {backendName}
+                                </TabsTrigger>
+                            ))}
+                        </TabsList>
+                    </Tabs>
+                </div>
+                <div className="flex justify-between items-center gap-4 bg-slate-800 rounded py-2 px-8 h-fit">
+                    Dataset:
+                    <Tabs
+                        value={datasetName}
+                        onValueChange={(v) => setDatasetName(v as DatasetName)}
+                    >
+                        <TabsList className="gap-2">
+                            <TabsTrigger
+                                value="wikitext-103"
+                                className="hover:!bg-slate-900"
+                            >
+                                wikitext-103
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="tiny-shakespeare"
+                                className="hover:!bg-slate-900"
+                            >
+                                tiny-shakespeare
+                            </TabsTrigger>
+                        </TabsList>
+                    </Tabs>
+                    <Separator orientation="vertical" />
+                    <button
+                        onClick={datasetBenchmark}
+                        className="bg-background rounded px-3 py-1.5 hover:bg-slate-900 text-sm font-medium"
+                    >
+                        benchmark
+                    </button>
+                </div>
+                <div className="flex justify-between items-center gap-4 bg-slate-800 rounded py-2 px-8 h-fit">
+                    Training:
+                    <button
+                        onClick={startTraining}
+                        className="bg-background rounded px-3 py-1.5 hover:bg-slate-900 text-sm font-medium"
+                    >
+                        run
+                    </button>
                 </div>
             </div>
-            <div className="flex items-center gap-5">
-                <p className="font-bold">Test: </p>
-                <div className="flex gap-2 w-full">
-                    <Btn callback={() => datasetTest()} name="Dataset" />
-                    <Btn callback={() => wandbTest()} name="Wandb" />
-                    <Btn callback={() => trainTest()} name="Train" />
-                </div>
-            </div>
-            <pre>{JSON.stringify(config, null, 2)}</pre>
         </main>
     )
 }

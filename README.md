@@ -52,7 +52,7 @@ Everything has been tested under Ubuntu 22.04.3 LTS (jammy), kernel 6.5.0-1009-o
     -   install: https://github.com/nvm-sh/nvm#installing-and-updating
 -   Bun
     -   install: https://github.com/oven-sh/bun
--   cuDNN (optional, I think)
+-   cuDNN
     -   sudo apt install nvidia-cudnn
     -   OR see: https://stackoverflow.com/questions/66977227/could-not-load-dynamic-library-libcudnn-so-8-when-running-tensorflow-on-ubun
 

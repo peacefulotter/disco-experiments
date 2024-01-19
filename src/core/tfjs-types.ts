@@ -1,5 +1,5 @@
 import * as tf from '@tensorflow/tfjs'
-import { model as gpt } from '#/gpt-tfjs'
+import { type ModelType } from '#/gpt-tfjs'
 
 export type BrowserBackendName = 'cpu' | 'webgl' | 'webgpu' | 'wasm'
 export type NodeBackendName = 'cpu' | 'wasm' | 'tensorflow'
@@ -13,18 +13,26 @@ export type Model = {
     blockSize?: number
 }
 
-export type EncodedDataset = tf.data.Dataset<tf.TensorContainer>
-
-export type TokenizedSample = {
-    xs: number[]
-    ys: number[]
-}
+export type TokenizedDataset = tf.data.Dataset<BatchedTokenizedTensorSample>
 
 export type AsyncTokenizedGenerator = AsyncGenerator<
-    TokenizedSample,
+    BatchedTokenizedTensorSample,
     void,
     unknown
 >
+
+export type BatchedTokenizedTensorSample = {
+    xs: tf.Tensor2D // tokens of size (B, blockSize)
+    ys: tf.Tensor3D // one hot encoded vector of size (B, blockSize, vocabSize)
+}
+
+export type TokenizedDatasetWithCallback = {
+    dataset: TokenizedDataset
+    onEnd?: () => void | Promise<void>
+}
+
+type CoreElement = number[] | Buffer | Uint8Array
+export type CoreIterator = AsyncIterator<CoreElement, CoreElement, CoreElement>
 
 export type Callback = (
     model: any,
@@ -32,30 +40,38 @@ export type Callback = (
     iter: number
 ) => Promise<void> | void
 
-export type BaseConfig = {
-    debug: boolean
-    verbose: boolean
-    modelType: gpt.ModelType
-    dataset: string
+export type GPTConfig = {
+    lr: number
     batchSize: number
     blockSize: number
-    lr: number
-    maxIter: number
-    weightDecay: number | false
+    vocabSize: number
+    evaluate?: boolean
+    maxEvalBatches?: number
+    evaluateEvery?: number
+    epochs?: number
+    maxIter?: number
+    weightDecay?: number
+    verbose?: boolean
+    bias?: boolean
+    debug?: boolean
+    dropout?: number
+    residDrop?: number
+    embdDrop?: number
+    tokEmb?: boolean
+    lmHead?: boolean
+    modelType: ModelType
+}
+
+export type BaseConfig = GPTConfig & {
+    dataset: string
     optimizer: string
     scheduler: string | null
-    dropout: number
-    residDrop: number
-    embdDrop: number
     gradientClipNorm: number
-    bias: boolean
-    numWorkers: number
     vocabSize: number
     wandbProject: string
     evalFreq: number
     evalSeqPrefix: string
     maxEvalBatches: number
-    shuffle: true | 'batch' | number
     gpu: string
 }
 
@@ -64,3 +80,10 @@ export type Config = BaseConfig &
         platform: 'browser' | 'node'
         backend: BackendName
     }
+
+export type ParsedWSSearchParams = {
+    id: string
+    config: Config
+    split: string
+}
+export type WSSearchParams = Record<keyof ParsedWSSearchParams, string>

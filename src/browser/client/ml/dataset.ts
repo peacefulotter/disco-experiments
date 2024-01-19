@@ -1,39 +1,81 @@
 'use client'
+import { v4 as randomUUID } from 'uuid'
 import * as tf from '@tensorflow/tfjs'
-import { Config } from '~/tfjs-types'
-import { getDataset as getBackboneDataset } from '~/dataset'
+import {
+    Config,
+    TokenizedDatasetWithCallback,
+    WSSearchParams,
+} from '~/tfjs-types'
+import { getDataset as getCoreDataset } from '~/dataset'
 
-const getWebSocket = async (split: string) =>
-    new Promise<WebSocket>((resolve) => {
-        const brokerURL = `ws://localhost:3001/ws?split=${split}`
-        const ws = new WebSocket(brokerURL)
+class Deferred<T> {
+    promise: Promise<T> = new Promise<T>(() => {})
+    resolve: (value: T | PromiseLike<T>) => void = () => {}
+    reject: (reason?: any) => void = () => {}
+
+    constructor() {
+        this.reset()
+    }
+
+    reset() {
+        this.promise = new Promise<T>((resolve, reject) => {
+            this.resolve = resolve
+            this.reject = reject
+        })
+    }
+}
+
+const getWebSocket = (config: Config, split: string) => {
+    const BROKER_URL = 'ws://localhost:3001/ws'
+    const url = new URL(BROKER_URL)
+
+    const id = randomUUID()
+    const searchParams: WSSearchParams = {
+        id,
+        config: JSON.stringify(config),
+        split,
+    }
+    for (const [k, v] of Object.entries(searchParams))
+        url.searchParams.append(k, v)
+
+    const ws = new WebSocket(url)
+
+    ws.onerror = (err) => {
+        console.error(err)
+    }
+
+    return new Promise<{ ws: WebSocket; id: string }>((resolve) => {
         ws.onopen = () => {
-            console.log('Dataset websocket open for split', split)
-            resolve(ws)
+            resolve({ ws, id })
         }
     })
+}
 
-export default async function getDataset(config: Config, split: string) {
-    const ws = await getWebSocket(split)
+export default async function getDataset(
+    config: Config,
+    split: string
+): Promise<TokenizedDatasetWithCallback> {
+    const { ws, id } = await getWebSocket(config, split)
 
-    const requestNext = async () =>
-        new Promise<number[]>((resolve) => {
-            // console.time('requestNext')
-            ws.onmessage = (payload) => {
-                const buffer = JSON.parse(payload.data) as {
-                    type: Buffer
-                    data: number[]
-                }
-                // console.timeEnd('requestNext')
-                resolve(buffer.data)
-            }
-            setTimeout(() => ws.send('req'), 1)
-        })
+    const cache = new Deferred<{ value: Buffer; done: boolean }>()
 
-    const dataset = await getBackboneDataset(tf, config, requestNext)
+    ws.onmessage = (payload: globalThis.MessageEvent<Buffer>) => {
+        cache.resolve({ value: payload.data, done: false })
+    }
+
+    const iterator = {
+        next: async () => {
+            ws.send(JSON.stringify({ id }))
+            const sample = await cache.promise
+            cache.reset()
+            return sample
+        },
+    }
+
+    const dataset = await getCoreDataset(tf, config, iterator)
 
     return {
         dataset,
-        closeWS: () => ws.close(),
+        onEnd: () => ws.close(),
     }
 }

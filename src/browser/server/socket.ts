@@ -1,36 +1,64 @@
-import { WebSocketServer } from 'ws'
-import { Server } from './types.js'
-import {
-    getDatasetFile,
-    getIteratorDatasetFromFile,
-} from '../../core/dataset-node.js'
-import config from '../../core/config.js'
-import { IncomingMessage } from 'http'
+import * as tf from '@tensorflow/tfjs-node'
+import { Config, ParsedWSSearchParams, WSSearchParams } from '~/tfjs-types'
+import { getInfiniteBufferIteratorFromFile } from '~/dataset-node'
 
-const dummyUrl = 'http://localhost:3001' // can be anything as long as it's a valid URL
-
-const getSplit = (req: IncomingMessage) => {
-    const url = new URL(`${dummyUrl}${req.url}`)
-    const split = url.searchParams.get('split') as string
-    console.log('Requested split:', split)
-    return split
+const getParams = (searchParams: URLSearchParams) => {
+    const obj = Object.fromEntries(searchParams) as WSSearchParams
+    const params: ParsedWSSearchParams = {
+        id: obj.id,
+        config: JSON.parse(obj.config) as Config,
+        split: obj.split,
+    }
+    return params
 }
 
-const initWebsockets = async (server: Server) => {
-    const wss = new WebSocketServer({ server })
-
-    wss.on('connection', async (ws, req) => {
-        console.log('Connection with client established')
-
-        const split = getSplit(req)
-        const file = await getDatasetFile(config, split)
-        const dataset = getIteratorDatasetFromFile(config, file)
-
-        ws.on('message', async (data) => {
-            const { value } = await dataset.next()
-            ws.send(JSON.stringify(value))
-        })
-    })
+type WebsocketStatus = {
+    iterator: AsyncIterator<Buffer, Buffer, Buffer>
+    next: Promise<IteratorResult<Buffer, Buffer>>
 }
 
-export default initWebsockets
+const database: Record<string, WebsocketStatus> = {}
+
+// The websocket server only serves the dataset, no need for any GPU backend
+const done = await tf.setBackend('cpu')
+console.log(
+    'Backend set?',
+    done,
+    'to',
+    tf.engine().backendName,
+    tf.getBackend()
+)
+
+Bun.serve({
+    async fetch(req, server) {
+        const url = new URL(req.url)
+        const { id, config, split } = getParams(url.searchParams)
+        console.log(config)
+        const iterator = await getInfiniteBufferIteratorFromFile(config, split)
+        const next = iterator.next()
+        database[id] = { iterator, next }
+        server.upgrade(req)
+    },
+    websocket: {
+        async message(ws, payload) {
+            const { id } = JSON.parse(payload as string) as {
+                id: string
+            }
+            const status = database[id]
+            const data = await status.next
+            ws.send(data.value)
+
+            // same as in core text-loader, we pre-fetch the next chunk even before actually requesting it
+            status.next = status.iterator.next()
+        },
+        async open(ws) {
+            console.log('[WebSocketServer] Connection with client established')
+        },
+        async close(ws) {
+            // TODO: on websocket close, remove from database
+            console.log('[WebSocketServer] Bye')
+        },
+    },
+    // TODO: store this and URL in .env to share URL between web/ and server/
+    port: process.env.PORT || 3001,
+})

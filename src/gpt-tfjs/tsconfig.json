@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "rootDir": "..",
-        "rootDirs": [".", "../discojs-core"],
+        "rootDirs": [".", "../core"],
         "lib": ["ESNext", "dom"],
         "module": "esnext",
         "target": "esnext",
@@ -28,14 +28,9 @@
         "checkJs": false,
         "paths": {
             "@/*": ["*"],
-            "@epfml/discojs-core": ["../discojs-core/src"]
+            "~/*": ["../core/*"]
         }
     },
-    "include": [
-        "**/*.ts",
-        "decs.d.ts",
-        "../discojs-core/src/**/*.ts",
-        "../../browser/server/wandb-node.ts"
-    ],
+    "include": ["**/*.ts", "../core/**/*.ts"],
     "exclude": ["./node_modules/**/*", "./dist/**/*"]
 }

@@ -2,7 +2,7 @@ import * as tf from '@tensorflow/tfjs-node'
 import fs from 'fs'
 import { readdir } from 'fs/promises'
 import path from 'path'
-import { getDataset as getBackboneDataset } from './dataset'
+import { getDataset as getCoreDataset } from './dataset'
 import { Config } from './tfjs-types'
 
 // For ts-node-esm
@@ -11,26 +11,19 @@ import { TOKENIZED_FILE_EXTENSION } from './preprocess'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-export const getDatasetDir = (config: Config) =>
+const getDatasetDir = (config: Config) =>
     path.join(__dirname, '../../', 'datasets', config.dataset)
 
-export function getFileStream(config: Config, file: string) {
-    const datasetDir = getDatasetDir(config)
-
-    // blockSize to get an initial full x
-    // + batchSize to retrieve a batch from it (each element of the batch is a shift by << n for the nth elt in batch)
-    // + 1 for the last y of the batch
-    // * 2 because we store the tokens into 2 bytes (16 bites uint)
-    // TODO: sure about this?
-    const highWaterMark = (config.blockSize + 1) * config.batchSize * 2 // (config.blockSize + config.batchSize + 1) * 2
-    console.log('highWaterMark', highWaterMark)
-
-    return fs.createReadStream(path.join(datasetDir, file), {
-        highWaterMark, // set this to seq length * 2 because we store uint16,
+function getFileStream(source: string, chunkSize: number) {
+    return new Promise<fs.ReadStream>((resolve) => {
+        const stream = fs.createReadStream(source, {
+            fd: undefined,
+            highWaterMark: chunkSize,
+        })
+        stream.on('readable', () => resolve(stream))
     })
 }
-
-export async function getDatasetFile(config: Config, split: string) {
+async function getDatasetFile(config: Config, split: string) {
     const datasetDir = getDatasetDir(config)
     console.log('Preprocessed dataset located at:', datasetDir)
 
@@ -46,42 +39,52 @@ export async function getDatasetFile(config: Config, split: string) {
         'under',
         datasetDir
     )
-    return file
+    return path.join(datasetDir, file)
 }
 
-export function getIteratorDatasetFromFile(
+export const getChunkSize = (config: Config) => {
+    // blockSize + 1 = input size (size of x = blockSize, size of y = blockSize shifted right by 1, thus the + 1)
+    // * batchSize to retrieve a batch at once
+    // * 2 because tokens are stored as uint16 and thus require 2 bytes
+    return (config.blockSize + 1) * config.batchSize * 2
+}
+
+export async function getInfiniteBufferIteratorFromFile(
     config: Config,
-    file: string
-): AsyncIterator<Buffer, Buffer> {
-    const getStream = () => {
-        const stream = getFileStream(config, file)
-        return {
-            stream,
-            iter: stream.iterator() as AsyncIterableIterator<Buffer>,
-        }
-    }
-    let { stream, iter } = getStream()
+    split: string
+): Promise<AsyncIterator<Buffer, Buffer, Buffer>> {
+    const chunkSize = getChunkSize(config)
+
+    if (isNaN(chunkSize))
+        throw new Error(
+            'chunk size, is NaN but is supposed to be of type number'
+        )
+
+    const file = await getDatasetFile(config, split)
+    const getStream = async () => await getFileStream(file, chunkSize)
+
+    let stream = await getStream()
     return {
         next: async () => {
-            let sample = await iter.next()
-            if (sample.done) {
+            let buffer = (await stream.read(chunkSize)) as Buffer | undefined
+            if (!buffer) {
                 stream.close()
-                const newStream = getStream()
-                stream = newStream.stream
-                iter = newStream.iter
-                sample = await iter.next()
+                stream = await getStream()
+                buffer = await stream.read(chunkSize)
+                if (!buffer) {
+                    throw new Error(
+                        'Getting a sample from the file stream still fails after retrying, most likely the file at ' +
+                            file +
+                            ' is empty..'
+                    )
+                }
             }
-            return sample
+            return { value: buffer, done: false }
         },
     }
 }
 
 export async function getDataset(config: Config, split: string) {
-    const file = await getDatasetFile(config, split)
-    const stream = getIteratorDatasetFromFile(config, file)
-    const requestNext = async () => {
-        const { value } = await stream.next()
-        return value.toJSON().data
-    }
-    return getBackboneDataset(tf, config, requestNext)
+    const requestNext = await getInfiniteBufferIteratorFromFile(config, split)
+    return getCoreDataset(tf, config, requestNext)
 }

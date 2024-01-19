@@ -34,7 +34,9 @@
         "**/*.tsx",
         ".next/types/**/*.ts",
         "decs.d.ts",
-        "../../core/**/*.ts"
+        "../../core/**/*.ts",
+        "../../gpt-tfjs/wandb-node.ts",
+        "../../gpt-tfjs/wandb.ts"
     ],
     "exclude": ["node_modules"]
 }

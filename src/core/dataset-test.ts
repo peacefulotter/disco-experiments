@@ -1,13 +1,11 @@
-import { getFileStream } from './dataset-node'
+import { getInfiniteBufferIteratorFromFile } from './dataset-node'
 import config from './config'
 import { toUInt16 } from './dataset'
-import { TOKENIZED_FILE_EXTENSION } from './preprocess'
 
 async function main() {
-    const split = 'train'
+    const iter = await getInfiniteBufferIteratorFromFile(config, 'train')
+
     const sampleSize = config.blockSize + 1
-    const stream = getFileStream(config, `${split}.${TOKENIZED_FILE_EXTENSION}`)
-    const iter = stream.iterator() as AsyncIterator<Buffer, Buffer>
 
     while (true) {
         const { value } = await iter.next()

@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
-        "rootDir": "..",
-        "rootDirs": [".", "../core"],
+        "rootDir": "../..",
+        "rootDirs": [".", "../../core"],
         "baseUrl": "./",
         "esModuleInterop": true,
         "module": "esnext",
@@ -23,9 +23,6 @@
         "isolatedModules": true,
         "incremental": true,
         "checkJs": false,
-        "types": [
-            "bun-types" // add Bun global
-        ],
         "paths": {
             "@/*": ["./*"],
             "~/*": ["../../core/*"]
@@ -34,9 +31,8 @@
     "include": [
         "../../core/**/*.ts",
         "./**/*.ts",
-        "./**/*.js",
-        "../../*.ts",
-        "../../*.js"
+        "../../gpt-tfjs/wandb-node.ts",
+        "../../gpt-tfjs/wandb.ts"
     ],
     "exclude": ["./node_modules/**/*", "./dist/**/*"]
 }

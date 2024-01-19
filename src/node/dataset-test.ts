@@ -6,8 +6,7 @@ import config from '~/config.js'
 // Test for performance
 async function main() {
     const testConfig = { ...config, batchSize: 8, blockSize: 128 }
-    let dataset = await getDataset(testConfig, 'train')
-    dataset = dataset.batch(testConfig.batchSize)
+    const dataset = await getDataset(testConfig, 'train')
     const iter = await dataset.iterator()
 
     console.time('time')

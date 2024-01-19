@@ -1,20 +1,9 @@
 import {
     Config,
     AsyncTokenizedGenerator,
-    EncodedDataset,
-    TokenizedSample,
+    CoreIterator,
+    TokenizedDataset,
 } from './tfjs-types'
-
-const tokenizedIterator = (
-    tf: any,
-    gen: () => AsyncTokenizedGenerator,
-    vocabSize: number
-): EncodedDataset => {
-    return tf.data.generator(gen as any).map((v: any & TokenizedSample) => ({
-        xs: tf.tensor1d(v.xs, 'int32'),
-        ys: tf.oneHot(v.ys, vocabSize),
-    }))
-}
 
 export const toUInt16 = (low: number, high: number) => {
     low &= 0xff
@@ -25,31 +14,45 @@ export const toUInt16 = (low: number, high: number) => {
 export async function getDataset(
     tf: any,
     config: Config,
-    requestNext: () => Promise<number[]>
-) {
-    const { vocabSize } = config
-    const sampleSize = config.blockSize + 1
+    iterator: CoreIterator
+): Promise<TokenizedDataset> {
+    const { vocabSize, blockSize } = config
+    const batchSize = config.batchSize
+    const sampleSize = blockSize + 1
 
     async function* generator(): AsyncTokenizedGenerator {
+        let next = iterator.next()
         while (true) {
-            const chunk = await requestNext()
+            const { value: chunk } = await next
             if (!chunk) break
 
-            for (let i = 0; i < config.batchSize; i++) {
-                const xs = []
-                const ys = []
+            // pre-fetch the next chunk even before actually requesting it
+            next = iterator.next()
+
+            const xs = tf.buffer([batchSize, blockSize], 'int32')
+            const ys = tf.buffer([batchSize, blockSize, vocabSize], 'int32')
+
+            for (let i = 0; i < batchSize; i++) {
                 for (let j = 0; j < sampleSize; j++) {
                     const idx = (i * sampleSize + j) * 2
                     const low = chunk[idx]
                     const high = chunk[idx + 1]
                     const token = toUInt16(low, high)
-                    if (j < sampleSize - 1) xs.push(token)
-                    if (j > 0) ys.push(token)
+                    if (j < sampleSize - 1) xs.set(token, i, j)
+                    if (j > 0) ys.set(1, i, j - 1, token)
                 }
-                yield { xs, ys }
             }
+
+            const x = xs.toTensor()
+            const y = ys.toTensor()
+            yield {
+                xs: x, //  as tf.Tensor2D,
+                ys: y, // as tf.Tensor3D,
+            }
+            tf.dispose([x, y])
         }
     }
 
-    return tokenizedIterator(tf, generator, vocabSize)
+    // cast as any because tf.data.generator does not take a type AsyncGenerator (but it works)
+    return tf.data.generator(generator as any)
 }

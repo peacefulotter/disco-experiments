@@ -1,1 +1,15 @@
-google-chrome --enable-unsafe-webgpu --enable-features=Vulkan,UseSkiaRenderer
+google-chrome \
+    --force-dark-mode \
+    --enable-features=WebUIDarkMode \
+    --enable-features=VaapiVideoEncoder,VaapiVideoDecoder,CanvasOopRasterization \
+    --enable-zero-copy \
+    --use-gl=desktop \
+    --ignore-gpu-blocklist \
+    --enable-oop-rasterization \
+    --enable-raw-draw \
+    --enable-gpu-rasterization \
+    --use-vulkan \
+    --disable-reading-from-canvas \
+    --disable-sync-preferences \
+    --enable-unsafe-webgpu \
+    --enable-features=Vulkan,UseSkiaRenderer

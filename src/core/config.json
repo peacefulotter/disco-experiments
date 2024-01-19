@@ -1,12 +1,12 @@
 {
     "debug": false,
     "verbose": false,
-    "modelType": "gpt-mini",
+    "modelType": "gpt-nano",
     "dataset": "wikitext-103",
     "batchSize": 4,
     "blockSize": 128,
     "lr": 0.001,
-    "maxIter": 1000,
+    "maxIter": 10,
     "weightDecay": false,
     "optimizer": "adamw",
     "scheduler": null,
@@ -17,10 +17,9 @@
     "bias": true,
     "numWorkers": 0,
     "vocabSize": 50258,
-    "wandbProject": "disco-benchmarks",
-    "evalFreq": 100,
+    "wandbProject": "disco-benchmarks-2",
+    "evalFreq": 50,
     "evalSeqPrefix": "none",
     "maxEvalBatches": 12,
-    "shuffle": null,
     "gpu": "nvidia-4070-ti"
 }
