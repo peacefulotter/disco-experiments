@@ -1,14 +1,16 @@
 'use client'
 import * as tf from '@tensorflow/tfjs'
+import '@tensorflow/tfjs-backend-webgpu'
 import { useEffect, useState } from 'react'
+
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { datasetTest, datasetBenchmark } from '@/ml/dataset-test'
 import { Separator } from '@/components/ui/separator'
-import * as gpt from '#/gpt-tfjs'
+import { evaluateTest } from '@/ml/evaluate-test'
 import { GPTConfigWithWandb } from '#/gpt-tfjs'
 import getConfig from '@/ml/config'
-import { datasetTest, datasetBenchmark } from '@/ml/dataset-test'
+import * as gpt from '#/gpt-tfjs'
 import main from '@/ml/train'
-import { evaluateTest } from '@/ml/evaluate-test'
 
 const DATASET_NAMES = ['wikitext-103', 'tiny-shakespeare'] as const
 type DatasetName = (typeof DATASET_NAMES)[number]

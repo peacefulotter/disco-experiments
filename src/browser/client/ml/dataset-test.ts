@@ -13,6 +13,7 @@ export async function datasetTest() {
     const { value } = await iter.next()
     const { xs, ys } = value
     console.log(xs.shape, ys.shape)
+    tf.dispose([xs, ys])
     onEnd?.()
 }
 
@@ -30,7 +31,9 @@ export async function datasetBenchmark() {
     console.log(label, 'starts', { blockSize, batchSize, vocabSize })
     console.time(label)
     for (let i = 0; i < iterations; i++) {
-        await iter.next()
+        const { value } = await iter.next()
+        const { xs, ys } = value
+        tf.dispose([xs, ys])
     }
     console.timeEnd(label)
 

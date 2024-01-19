@@ -1,5 +1,5 @@
 import * as tf from '@tensorflow/tfjs'
-import { type ModelType } from '#/gpt-tfjs'
+import { GPTConfig, type ModelType } from '#/gpt-tfjs'
 
 export type BrowserBackendName = 'cpu' | 'webgl' | 'webgpu' | 'wasm'
 export type NodeBackendName = 'cpu' | 'wasm' | 'tensorflow'
@@ -31,7 +31,7 @@ export type TokenizedDatasetWithCallback = {
     onEnd?: () => void | Promise<void>
 }
 
-type CoreElement = number[] | Buffer | Uint8Array
+export type CoreElement = number[] | Buffer | Uint8Array
 export type CoreIterator = AsyncIterator<CoreElement, CoreElement, CoreElement>
 
 export type Callback = (
@@ -39,28 +39,6 @@ export type Callback = (
     loss: number,
     iter: number
 ) => Promise<void> | void
-
-export type GPTConfig = {
-    lr: number
-    batchSize: number
-    blockSize: number
-    vocabSize: number
-    evaluate?: boolean
-    maxEvalBatches?: number
-    evaluateEvery?: number
-    epochs?: number
-    maxIter?: number
-    weightDecay?: number
-    verbose?: boolean
-    bias?: boolean
-    debug?: boolean
-    dropout?: number
-    residDrop?: number
-    embdDrop?: number
-    tokEmb?: boolean
-    lmHead?: boolean
-    modelType: ModelType
-}
 
 export type BaseConfig = GPTConfig & {
     dataset: string

@@ -1,5 +1,5 @@
-import { model as gpt } from '#/gpt-tfjs'
-import { BackendName, Config, EncodedDataset } from './tfjs-types'
+import * as gpt from '#/gpt-tfjs'
+import { BackendName, Config, TokenizedDataset } from './tfjs-types'
 import setBackend from './backend'
 
 function prepareIdx(tf: any, idx: any) {
@@ -62,7 +62,7 @@ type InferenceConfig = Config & {
 export default async function inference(
     tf: any,
     config: Config,
-    dataset: EncodedDataset,
+    dataset: TokenizedDataset,
     backendName: BackendName
 ) {
     await setBackend(tf, backendName)
@@ -80,7 +80,7 @@ export default async function inference(
     const iter = await dataset.iterator()
     for (let i = 0; i < inferenceIterations; i++) {
         const { value } = await iter.next()
-        const { xs: tokens } = value
+        const { xs: tokens, ys } = value
         const idx = prepareIdx(tf, tokens)
         const { timePerToken, timePrediction } = generateOnce(
             tf,
@@ -92,6 +92,7 @@ export default async function inference(
         stats[1] += timePerToken
         stats[2] += 1
         await new Promise((r) => setTimeout(r, 1))
+        tf.dispose([idx, tokens, ys])
     }
 
     console.log(

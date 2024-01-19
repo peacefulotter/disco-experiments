@@ -29,10 +29,6 @@
             "#/gpt-tfjs": ["../gpt-tfjs"]
         }
     },
-    "include": [
-        "**/*.ts",
-        "../core/**/*.ts",
-        "../gpt-tfjs/**/*.ts",
-    ],
+    "include": ["**/*.ts", "../core/**/*.ts", "../gpt-tfjs/**/*.ts"],
     "exclude": ["node_modules"]
 }

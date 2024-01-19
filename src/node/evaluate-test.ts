@@ -5,7 +5,11 @@ import config from '~/config'
 
 async function main() {
     const c = {
-        ...gpt.DEFAULT_CONFIG, ...config, maxEvalBatches: 100, platform: 'node', model: 'gpt-nano'
+        ...gpt.DEFAULT_CONFIG,
+        ...config,
+        maxEvalBatches: 100,
+        platform: 'node',
+        model: 'gpt-nano',
     }
     const model = gpt.GPT(c)
     const dataset = await getDataset(config, 'valid')

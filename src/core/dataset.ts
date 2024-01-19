@@ -49,7 +49,6 @@ export async function getDataset(
                 xs: x, //  as tf.Tensor2D,
                 ys: y, // as tf.Tensor3D,
             }
-            tf.dispose([x, y])
         }
     }
 
