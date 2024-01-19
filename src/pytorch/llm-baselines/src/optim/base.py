@@ -91,25 +91,33 @@ def train_base(
                     else extra_args.lr
                 )
 
-
                 payload = {
                     "time_s": time.time() - start,
                     "iter": itr,
                     "train/loss": train_loss,
                     "dt_ms": dt * 1000,
                     "lr": current_lr,
-                    "mem_cuda": torch.cuda.memory_allocated() / 1e9,
-                    "mem": process.memory_info().rss,
+                    "tf-mem": torch.cuda.memory_allocated() / 1e9,
                 }
 
                 val_acc, val_loss, val_perplexity = 0, 0, 0
                 if itr % eval_freq == 0:
-                    val_acc, val_loss, val_perplexity = eval(model, data['val'], sequence_length, batch_size, extra_args.device, max_num_batches=24, ctx=type_ctx)
-                    payload.update({
-                        "val/loss": val_loss,
-                        "val/perplexity": val_perplexity,
-                        "val/acc": val_acc,
-                    })
+                    val_acc, val_loss, val_perplexity = eval(
+                        model,
+                        data["val"],
+                        sequence_length,
+                        batch_size,
+                        extra_args.device,
+                        max_num_batches=24,
+                        ctx=type_ctx,
+                    )
+                    payload.update(
+                        {
+                            "val/loss": val_loss,
+                            "val/perplexity": val_perplexity,
+                            "val/acc": val_acc,
+                        }
+                    )
 
                     if extra_args.eval_seq_prefix != "none":
                         if text_table is None:

@@ -33,7 +33,6 @@ export async function evaluate(
         acc[1] += acc_tensor.shape[0] * acc_tensor.shape[1]
 
         tf.dispose([acc_tensor, acc_sum, loss, logits, xs, ys])
-        console.log(tf.memory())
 
         iteration++
     }

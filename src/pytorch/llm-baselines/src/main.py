@@ -53,7 +53,7 @@ def main(args):
     args.n_layer = train_config["nLayer"]
     args.dropout = train_config["dropout"]
     args.bias = train_config["bias"]
-    args.dataset = train_config["dataset"]
+    args.dataset = "wikitext" if train_config["dataset"] == "wikitext-103" else "none"
     args.scheduler = (
         train_config["scheduler"] if train_config["scheduler"] != None else "none"
     )
@@ -69,10 +69,11 @@ def main(args):
     args.acc_steps = 1
     args.wandb = True
 
+    dataset = train_config["dataset"]
     platform = train_config["platform"]
     gpu = train_config["gpu"]
     model_type = train_config["modelType"]
-    exp_name = f"exp_{platform}_{gpu}_{model_type}"
+    exp_name = f"llm-baseline_{dataset}_{platform}_{gpu}_{model_type}"
 
     torch.backends.cuda.matmul.allow_tf32 = (
         True  # allows us to make sure we're able to use tensorfloat32 during training
@@ -161,7 +162,9 @@ def main(args):
     if distributed_backend.is_master_process() and args.wandb:
         params_copy = copy.deepcopy(vars(args))
         del params_copy["device"]
-        wandb.init(project=args.wandb_project, name=exp_name, config=params_copy)
+        wandb.init(
+            project=args.wandb_project, name=exp_name, config=params_copy, force=True
+        )
 
     ckpt_path = os.path.join(
         args.results_base_folder, args.dataset, args.model, exp_name

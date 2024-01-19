@@ -59,8 +59,10 @@ export default async function getDataset(
 
     const cache = new Deferred<{ value: Buffer; done: boolean }>()
 
-    ws.onmessage = (payload: globalThis.MessageEvent<Buffer>) => {
-        cache.resolve({ value: payload.data, done: false })
+    ws.onmessage = async (payload: globalThis.MessageEvent<Blob>) => {
+        const arrayBuffer = await payload.data.arrayBuffer()
+        const value = Buffer.from(arrayBuffer)
+        cache.resolve({ value: value, done: false })
     }
 
     const iterator = {

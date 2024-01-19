@@ -1,9 +1,13 @@
 import json
+import os
 
-with open("models.json", "r") as f:
+dir_path = os.path.dirname(os.path.realpath(__file__))
+print(dir_path)
+
+with open(os.path.join(dir_path, "models.json"), "r") as f:
     configModels = json.load(f)
 
-with open("config.json", "r") as f:
+with open(os.path.join(dir_path, "config.json"), "r") as f:
     baseConfig = json.load(f)
 
 modelType = baseConfig["modelType"]
