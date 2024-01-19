@@ -46,12 +46,9 @@ Everything has been tested under Ubuntu 22.04.3 LTS (jammy), kernel 6.5.0-1009-o
 
 ## Prerequisites
 
--   Python
-    -   Python 3 installed (tested on 3.10.12) and pip
--   NVM
-    -   install: https://github.com/nvm-sh/nvm#installing-and-updating
--   Bun
-    -   install: https://github.com/oven-sh/bun
+-   Python 3 installed (tested on 3.10.12) and pip
+-   nvm: https://github.com/nvm-sh/nvm#installing-and-updating
+-   Bun: https://github.com/oven-sh/bun
 -   cuDNN
     -   sudo apt install nvidia-cudnn
     -   OR see: https://stackoverflow.com/questions/66977227/could-not-load-dynamic-library-libcudnn-so-8-when-running-tensorflow-on-ubun
@@ -61,10 +58,10 @@ Everything has been tested under Ubuntu 22.04.3 LTS (jammy), kernel 6.5.0-1009-o
 ```sh
 $ pip install wandb # Install wandb package to export training stats to WandB
 $ nvm install 18 # Set node version to 18.x
+$ bun i -g node-gyp
 $ git clone
 $ cd disco-experiments/
 $ ./install-wikitext.sh # Installs the wikitext-103-raw dataset
-$ bun install -g typescript ts-node
 # Install core dependencies and run preprocessing
 $ cd ./src/core/
 $ bun install

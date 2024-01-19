@@ -10,7 +10,7 @@ export type WandbSave = {
     logs: any[]
 }
 
-const exportWandb = async (save: WandbSave) => {
+export const exportWandb = async (save: WandbSave) => {
     let fs
     try {
         fs = require('fs/promises')

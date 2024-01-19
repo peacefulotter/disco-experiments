@@ -55,7 +55,7 @@ const getCustomAdam = (model: any, c: Required<GPTConfig>): tf.Optimizer => {
 }
 
 export async function train(
-    model: any,
+    model: tf.LayersModel,
     ds: TokenizedDataset,
     config: Config,
     getEvalDataset?: () => Promise<TokenizedDatasetWithCallback>
@@ -63,6 +63,32 @@ export async function train(
     console.log('Starting training on', tf.getBackend(), 'backend')
     const c = getConfig(config)
     console.log(c)
+
+    // model.compile({
+    //     optimizer: tf.train.adam(c.lr),
+    //     loss: tf.losses.softmaxCrossEntropy,
+    //     metrics: {
+    //         entropy: (y, pred) => {
+    //             console.log(y.shape, pred.shape)
+    //             return tf.losses.softmaxCrossEntropy(y, pred)
+    //         },
+    //     },
+    // })
+
+    // const history = await model.fitDataset(ds, {
+    //     epochs: 1,
+    //     batchesPerEpoch: 5,
+    //     callbacks: {
+    //         onBatchBegin(batch, logs) {
+    //             console.log('onBatchBegin', batch, logs)
+    //         },
+    //         onBatchEnd(batch, logs) {
+    //             console.log('onBatchEnd', batch, logs)
+    //         },
+    //     },
+    // })
+
+    // console.log(history)
 
     const opt = c.weightDecay ? getCustomAdam(model, c) : tf.train.adam(c.lr)
 

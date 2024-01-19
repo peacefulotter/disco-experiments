@@ -37,6 +37,7 @@ Bun.serve({
         const iterator = await getInfiniteBufferIteratorFromFile(config, split)
         const next = iterator.next()
         database[id] = { iterator, next }
+        console.log(req)
         server.upgrade(req)
     },
     websocket: {

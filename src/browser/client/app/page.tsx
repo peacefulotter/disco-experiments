@@ -6,7 +6,7 @@ import { Separator } from '@/components/ui/separator'
 import * as gpt from '#/gpt-tfjs'
 import { GPTConfigWithWandb } from '#/gpt-tfjs'
 import getConfig from '@/ml/config'
-import datasetTest from '@/ml/dataset-test'
+import { datasetTest, datasetBenchmark } from '@/ml/dataset-test'
 import main from '@/ml/train'
 
 const DATASET_NAMES = ['wikitext-103', 'tiny-shakespeare'] as const
@@ -23,10 +23,6 @@ export default function Home() {
         setAvailableBackends(tf.engine().backendNames())
         setBackend(tf.getBackend())
     }, [])
-
-    const datasetBenchmark = async () => {
-        datasetTest()
-    }
 
     const startTraining = async () => {
         await main(backendName as any).catch(console.error)
@@ -93,6 +89,12 @@ export default function Home() {
                         </TabsList>
                     </Tabs>
                     <Separator orientation="vertical" />
+                    <button
+                        onClick={datasetTest}
+                        className="bg-background rounded px-3 py-1.5 hover:bg-slate-900 text-sm font-medium"
+                    >
+                        test
+                    </button>
                     <button
                         onClick={datasetBenchmark}
                         className="bg-background rounded px-3 py-1.5 hover:bg-slate-900 text-sm font-medium"

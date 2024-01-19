@@ -3,7 +3,20 @@ import * as tf from '@tensorflow/tfjs'
 import getDataset from './dataset'
 import getConfig from './config'
 
-export default async function datasetTest() {
+export async function datasetTest() {
+    console.log('dataset test')
+    await tf.ready()
+    const config = await getConfig()
+    const testConfig = { ...config }
+    const { dataset, onEnd } = await getDataset(testConfig, 'train')
+    const iter = await dataset.iterator()
+    const { value } = await iter.next()
+    const { xs, ys } = value
+    console.log(xs.shape, ys.shape)
+    onEnd?.()
+}
+
+export async function datasetBenchmark() {
     await tf.ready()
 
     const config = await getConfig()
