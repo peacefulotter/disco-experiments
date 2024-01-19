@@ -1,7 +1,7 @@
 import { GPTConfigWithWandb } from '.'
 import { TokenizedDataset } from './tfjs-types'
 
-export default async function evaluate(
+export async function evaluate(
     tf: any,
     model: any,
     dataset: TokenizedDataset,
@@ -32,7 +32,7 @@ export default async function evaluate(
         acc[0] += await acc_sum.array()
         acc[1] += acc_tensor.shape[0] * acc_tensor.shape[1]
 
-        tf.dispose([acc_tensor, acc_sum, loss, logits, xs, ys])
+        tf.dispose([acc_tensor, acc_sum, loss, logits])
 
         iteration++
     }

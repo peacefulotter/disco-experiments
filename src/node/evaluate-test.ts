@@ -1,14 +1,15 @@
 import * as tf from '@tensorflow/tfjs-node'
-import { model } from 'gpt-tfjs'
+import * as gpt from '#/gpt-tfjs'
 import { getDataset } from '~/dataset-node'
 import config from '~/config'
-import evaluate from '~/evaluate'
-const { GPTLMHeadModel } = model
 
 async function main() {
-    const gpt = GPTLMHeadModel(config)
+    const c = {
+        ...gpt.DEFAULT_CONFIG, ...config, maxEvalBatches: 100, platform: 'node', model: 'gpt-nano'
+    }
+    const model = gpt.GPT(c)
     const dataset = await getDataset(config, 'valid')
-    const res = await evaluate(tf, gpt, dataset, config)
+    const res = await gpt.evaluate(tf, model, dataset, c)
     console.log(res)
     console.log(tf.memory())
 }

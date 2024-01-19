@@ -8,6 +8,7 @@ import { GPTConfigWithWandb } from '#/gpt-tfjs'
 import getConfig from '@/ml/config'
 import { datasetTest, datasetBenchmark } from '@/ml/dataset-test'
 import main from '@/ml/train'
+import { evaluateTest } from '@/ml/evaluate-test'
 
 const DATASET_NAMES = ['wikitext-103', 'tiny-shakespeare'] as const
 type DatasetName = (typeof DATASET_NAMES)[number]
@@ -109,6 +110,15 @@ export default function Home() {
                         className="bg-background rounded px-3 py-1.5 hover:bg-slate-900 text-sm font-medium"
                     >
                         run
+                    </button>
+                </div>
+                <div className="flex justify-between items-center gap-4 bg-slate-800 rounded py-2 px-8 h-fit">
+                    Evaluation:
+                    <button
+                        onClick={evaluateTest}
+                        className="bg-background rounded px-3 py-1.5 hover:bg-slate-900 text-sm font-medium"
+                    >
+                        test
                     </button>
                 </div>
             </div>

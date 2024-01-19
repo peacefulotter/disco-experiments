@@ -6,7 +6,7 @@ import {
     TokenizedDataset,
     TokenizedDatasetWithCallback,
 } from '~/tfjs-types'
-import evaluate from './evaluate'
+import {evaluate} from './evaluate'
 import Wandb from './wandb'
 
 export type WandbConfig = GPTConfig & {
@@ -26,7 +26,6 @@ export const getConfig = (config: Config): GPTConfigWithWandb => ({
         typeof window !== 'undefined' && typeof window.document !== 'undefined'
             ? 'browser'
             : 'node',
-    gpu: 'nvidia-4070-ti',
     model: config.modelType,
     backend: tf.getBackend(),
 })
@@ -116,7 +115,7 @@ export async function train(
             next = await iterator.next()
         }
         const { xs, ys } = next.value
-
+        
         datasetTime = Date.now() - datasetTime
 
         let iterationTime = Date.now()
@@ -134,6 +133,7 @@ export async function train(
         })
 
         const lossVal = await loss.array()
+        loss.dispose()
 
         // Create a WandB log payload, evaluate every
         const memory = tf.memory().numBytes * 0.000001
@@ -161,7 +161,6 @@ export async function train(
         wandb.log(payload)
         time = Date.now()
 
-        tf.dispose([loss, xs, ys])
 
         iterationTime = Date.now() - iterationTime
         console.log(

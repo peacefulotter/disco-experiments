@@ -3,6 +3,12 @@ import sys
 import json
 import wandb
 
+# os.environ['TMPDIR'] = '/home/nmaire/wandb'
+# os.environ['WANDB_DIR'] = '/home/nmaire/wandb'
+# os.environ['WANDB_CACHE_DIR'] = '/home/nmaire/wandb'
+# os.environ['WANDB_CONFIG_DIR'] = '/home/nmaire/wandb'
+# os.environ['WANDB_CONFIG_PATHS'] = '/home/nmaire/wandb'
+
 if len(sys.argv) < 6:
     print(
         """
