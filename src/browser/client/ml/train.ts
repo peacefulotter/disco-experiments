@@ -6,6 +6,7 @@ import { BrowserBackendName } from '~/tfjs-types'
 import getConfig from './config'
 
 export default async function main(backendName: BrowserBackendName) {
+    console.log('main', backendName, tf.engine().backendNames())
     const config = await getConfig()
     const getTrainDataset = () => getDataset(config, 'train')
     const getEvalDataset = () => getDataset(config, 'valid')
