@@ -153,6 +153,10 @@ Training done on the wikitext-103-raw dataset for 2500 steps.
 
 #### Evaluation
 
+<div align='center'>
+    <img width='1200' height='200' src='./assets/eval.png'/>
+</div>
+
 ## Inference
 
 For inference, we consider the time in ms the model takes to predict the next token. An average is taken over 100 iterations of 3 independent runs.
