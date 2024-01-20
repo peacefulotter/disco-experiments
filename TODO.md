@@ -1,2 +1,0 @@
--   minGPT compatible with config.py and add a run.sh script
--   Add inference script to node and python
