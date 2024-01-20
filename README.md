@@ -139,18 +139,24 @@ $ python3 wandb-export.py {platform} {backendname} # platform=browser|node, back
 
 # Results
 
-Benchmarks are run for the gpt-nano model on an Nvidia 4070 Ti GPU and AMD Ryzen 5 7600 6-Core CPU.
+Benchmarks are run for the gpt-nano, gpt-micro and gpt-mini models on an Nvidia 4070 Ti GPU and AMD Ryzen 5 7600 6-Core CPU. An Nvidia RTX A5000 is used for comparion.
 
-### Training
+## Training
 
-### Inference
+Training done on the wikitext-103-raw dataset for 2500 steps.
 
-For inference, we consider the time in ms the model takes to predict the next token. An average is taken over 200 iterations of 3 independent runs.
+<div align='center'>
+    <img width='900' height='300' src='./assets/train.png'/>
+    <img width='700' height='300' src='./assets/iter.png'/>
+    <img width='700' height='300' src='./assets/mem.png'/>
+</div>
 
--   browser
-    -   WebGL: 5ms
-    -   WebGPU: 6ms
-    -   CPU: 1000ms
--   node
-    -   tensorflow: 9ms
-    -   CPU: 1050ms
+#### Evaluation
+
+## Inference
+
+For inference, we consider the time in ms the model takes to predict the next token. An average is taken over 100 iterations of 3 independent runs.
+
+<div align='center'>
+    <img width='700' height='300' src='./assets/inference.png'/>
+</div>
