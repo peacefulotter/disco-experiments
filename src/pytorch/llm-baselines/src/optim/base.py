@@ -97,7 +97,7 @@ def train_base(
                     "train/loss": train_loss,
                     "dt_ms": dt * 1000,
                     "lr": current_lr,
-                    "tf-mem": torch.cuda.memory_allocated() / 1e9,
+                    "tf-mem": torch.cuda.memory_allocated() / 1e6,
                 }
 
                 val_acc, val_loss, val_perplexity = 0, 0, 0
