@@ -69,6 +69,8 @@ def main(args):
     args.acc_steps = 1
     args.wandb = True
 
+    print(args)
+
     dataset = train_config["dataset"]
     platform = train_config["platform"]
     gpu = train_config["gpu"]
@@ -122,6 +124,7 @@ def main(args):
         g["params"] = params
         optimized_params_cnt += sum([p.numel() for p in g["params"]])
     print("number of optimized parameters: %.2fM" % (optimized_params_cnt / 1e6,))
+
     if args.opt == "adamw":
         use_fused = (device_type == "cuda") and (
             "fused" in inspect.signature(torch.optim.AdamW).parameters

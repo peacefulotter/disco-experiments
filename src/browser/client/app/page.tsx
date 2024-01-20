@@ -11,6 +11,8 @@ import { GPTConfigWithWandb } from '#/gpt-tfjs'
 import getConfig from '@/ml/config'
 import * as gpt from '#/gpt-tfjs'
 import main from '@/ml/train'
+import inferenceTest from '@/ml/inference-test'
+import Charts from './Charts'
 
 const DATASET_NAMES = ['wikitext-103', 'tiny-shakespeare'] as const
 type DatasetName = (typeof DATASET_NAMES)[number]
@@ -22,7 +24,10 @@ export default function Home() {
     const [backendName, setBackendName] = useState<string>('cpu')
 
     useEffect(() => {
-        getConfig().then((c) => setConfig(gpt.getConfig(c)))
+        getConfig().then((c) => {
+            console.log(c)
+            setConfig(gpt.getConfig(c))
+        })
         setAvailableBackends(tf.engine().backendNames())
         setBackend(tf.getBackend())
     }, [])
@@ -123,6 +128,16 @@ export default function Home() {
                         test
                     </button>
                 </div>
+                <div className="flex justify-between items-center gap-4 bg-slate-800 rounded py-2 px-8 h-fit">
+                    Inference:
+                    <button
+                        onClick={inferenceTest}
+                        className="bg-background rounded px-3 py-1.5 hover:bg-slate-900 text-sm font-medium"
+                    >
+                        test
+                    </button>
+                </div>
+                <Charts />
             </div>
         </main>
     )

@@ -8,6 +8,7 @@ export default async function getConfig() {
         headers: {
             'Content-Type': 'application/json',
         },
+        cache: 'no-store',
     })
     const config = (await res.json()) as Config
     config.platform = 'browser'

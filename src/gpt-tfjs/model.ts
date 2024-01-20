@@ -1,5 +1,5 @@
 import * as tf from '@tensorflow/tfjs'
-import { train } from './train'
+import { getModelSizes } from '.'
 
 const Range = (config: any) => new Range_(config)
 class Range_ extends tf.layers.Layer {
@@ -395,48 +395,18 @@ function GPT(conf: any) {
         debug: false,
         tokEmb: true,
         lmHead: true,
+        vocabSize: 50257,
+        blockSize: 128,
     }
-    const configModels = {
-        gpt2: {
-            nLayer: 12,
-            nHead: 12,
-            nEmbd: 768,
-            vocabSize: 50257,
-            blockSize: 1024,
-        },
-        'gpt2-medium': {
-            nLayer: 24,
-            nHead: 16,
-            nEmbd: 1024,
-            vocabSize: 50257,
-            blockSize: 1024,
-        },
-        'gpt2-large': {
-            nLayer: 36,
-            nHead: 20,
-            nEmbd: 1280,
-            vocabSize: 50257,
-            blockSize: 1024,
-        },
-        'gpt2-xl': {
-            nLayer: 48,
-            nHead: 25,
-            nEmbd: 1600,
-            vocabSize: 50257,
-            blockSize: 1024,
-        },
-        'gpt-mini': { nLayer: 6, nHead: 6, nEmbd: 192 },
-        'gpt-micro': { nLayer: 4, nHead: 4, nEmbd: 128 },
-        'gpt-nano': { nLayer: 3, nHead: 3, nEmbd: 48 },
-    }
+
     if (conf.modelType) {
-        if (!Object.keys(configModels).includes(conf.modelType)) {
+        const modelConfig = getModelSizes(conf.modelType)
+        if (!modelConfig) {
             throw new Error(`Invalid modelType: ${conf.modelType}`)
         }
-        const modelConfig =
-            configModels[conf.modelType as keyof typeof configModels]
         Object.assign(configDefaults, modelConfig)
     }
+    console.log('GPT config', configDefaults)
 
     const config = Object.assign({}, configDefaults, conf)
 

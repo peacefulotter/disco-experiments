@@ -2,13 +2,12 @@
 import * as tf from '@tensorflow/tfjs'
 
 import inference from '~/inference'
-import { BrowserBackendName } from '~/tfjs-types'
 import getDataset from './dataset'
 import getConfig from './config'
 
-export default async function inferenceTest(backendName: BrowserBackendName) {
+export default async function inferenceTest() {
     const config = await getConfig()
-    let { dataset, onEnd } = await getDataset(config, 'valid')
-    await inference(tf, config, dataset, backendName)
+    const { dataset, onEnd } = await getDataset(config, 'train')
+    await inference(tf, config, dataset)
     onEnd?.()
 }

@@ -7,7 +7,7 @@ export type ModelType =
     | 'gpt-micro'
     | 'gpt-nano'
 
-type ModelSize = {
+export type ModelSize = {
     nLayer?: number
     nHead?: number
     nEmbd?: number
