@@ -60,11 +60,11 @@ Everything has been tested under
 ## Setup
 
 ```sh
-$ pip install wandb # Install wandb package to export training stats to WandB
+$ pip install wandb # [Only required if you wish to export training stats to WandB]
 $ nvm install 18 # Set node version to 18.x
-$ bun i -g node-gyp
+$ bun i -g node-gyp # Had some issues when that wasn't installed
 
-$ git clone
+$ git clone https://github.com/peacefulotter/disco-experiments.git # Clone the repo
 $ cd disco-experiments/
 $ ./install-wikitext.sh # Installs the wikitext-103-raw dataset
 
