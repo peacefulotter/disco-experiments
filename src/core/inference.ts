@@ -1,7 +1,9 @@
+import * as tf from '@tensorflow/tfjs-node'
 import * as gpt from '#/gpt-tfjs'
+import { encode, decode } from 'gpt-tokenizer/esm/model/text-davinci-003'
 import { Config, TokenizedDataset } from './tfjs-types'
 
-function prepareIdx(tf: any, idx: any) {
+function prepareIdx(idx: any) {
     tf.tidy(() => {
         // Check if idx is a tensor or an array
         if (idx instanceof tf.Tensor) {
@@ -23,10 +25,10 @@ function prepareIdx(tf: any, idx: any) {
     return idx
 }
 
-function generateOnce(tf: any, model: any, idx: any, config: any) {
+function generateOnce(model: any, idx: any, config: any) {
     let timePerToken = performance.now()
     let timePrediction = 0
-    tf.tidy(() => {
+    const token = tf.tidy(() => {
         const block_size = model.inputs[0].shape[1]
         const idxCond =
             idx.shape[1] <= block_size
@@ -44,18 +46,36 @@ function generateOnce(tf: any, model: any, idx: any, config: any) {
         // apply softmax to convert logits to (normalized) probabilities
         const probs = logitsScaled.softmax(-1)
         const idxNext = probs.argMax(-1).expandDims(1)
-        tf.dispose([logits, logitsScaled, probs, idxNext])
+        const next = idxNext.arraySync() as number[][]
+        tf.dispose([logits, logitsScaled, probs])
+        return next[0][0]
     })
     timePerToken = performance.now() - timePerToken
     return {
+        token,
         timePerToken,
         timePrediction,
     }
 }
 
-type InferenceConfig = Config & {
-    maxLength: number
+type InferenceConfig = {
     temperature: number
+}
+
+export async function generateFromString(
+    model: any,
+    input: string,
+    max_new_tokens: number
+) {
+    const inputTokens = encode(input)
+    for (let i = 0; i < max_new_tokens; i++) {
+        const idx: tf.Tensor = prepareIdx(inputTokens)
+        const { token } = generateOnce(model, idx, { temperature: 1 })
+        inputTokens.push(token)
+        tf.dispose([idx])
+    }
+    const output = decode(inputTokens)
+    console.log('decoded:', output.replaceAll('\n', ''))
 }
 
 export default async function inference(
@@ -66,10 +86,7 @@ export default async function inference(
     const inferenceIterations = 100
     const model = gpt.GPT(config)
     const params: InferenceConfig = {
-        maxLength: 32,
         temperature: 1,
-        ...config,
-        batchSize: 16,
     }
     const stats: [number, number] = [0, 0]
 
@@ -77,9 +94,8 @@ export default async function inference(
     for (let i = 0; i < inferenceIterations; i++) {
         const { value } = await iter.next()
         const { xs: tokens, ys } = value
-        const idx = prepareIdx(tf, tokens)
+        const idx = prepareIdx(tokens)
         const { timePerToken, timePrediction } = generateOnce(
-            tf,
             model,
             idx,
             params

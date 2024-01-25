@@ -7,6 +7,7 @@ import { getDataset } from '~/dataset-node'
 import config from '~/config'
 import train from '~/train'
 import { NodeBackendName } from '~/tfjs-types'
+import { generateFromString } from '~/inference'
 
 setWasmPaths('./node_modules/@tensorflow/tfjs-backend-wasm/dist/')
 
@@ -18,7 +19,22 @@ export default async function main(backendName: NodeBackendName) {
         dataset: await getDataset(config, 'valid'),
     })
 
-    await train(tf, config, backendName, getTrainDataset, getEvalDataset)
+    const callback = async (model: tf.LayersModel) => {
+        generateFromString(
+            model,
+            'First Citizen: \n We are accounted poor citizens, the patricians good.',
+            24
+        )
+    }
+
+    await train(
+        tf,
+        config,
+        backendName,
+        getTrainDataset,
+        getEvalDataset,
+        callback
+    )
 }
 
 const isBackendName = (name: string): name is NodeBackendName =>

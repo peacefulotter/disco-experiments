@@ -54,7 +54,6 @@ export default class Wandb {
     }
 
     public async finish() {
-        console.log(this.save)
         try {
             await exportWandb(this.save)
         } catch {

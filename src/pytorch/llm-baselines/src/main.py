@@ -53,7 +53,9 @@ def main(args):
     args.n_layer = train_config["nLayer"]
     args.dropout = train_config["dropout"]
     args.bias = train_config["bias"]
-    args.dataset = "wikitext" if train_config["dataset"] == "wikitext-103" else "none"
+    args.dataset = (
+        "wikitext" if train_config["dataset"] == "wikitext-103" else "shakespeare-char"
+    )
     args.scheduler = (
         train_config["scheduler"] if train_config["scheduler"] != None else "none"
     )

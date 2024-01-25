@@ -1,3 +1,4 @@
+import * as tf from '@tensorflow/tfjs'
 import * as gpt from '#/gpt-tfjs'
 
 import setBackend from './backend'
@@ -8,7 +9,8 @@ export default async function train(
     config: Config,
     backendName: BackendName,
     getTrainDataset: () => Promise<TokenizedDatasetWithCallback>,
-    getEvalDataset: () => Promise<TokenizedDatasetWithCallback>
+    getEvalDataset: () => Promise<TokenizedDatasetWithCallback>,
+    callback?: (model: tf.LayersModel) => Promise<void>
 ) {
     await setBackend(tf, backendName)
 
@@ -19,7 +21,7 @@ export default async function train(
 
     const model = gpt.GPT(config)
 
-    await gpt.train(model, trainDataset, config, getEvalDataset)
+    await gpt.train(model, trainDataset, config, getEvalDataset, callback)
 
     await onTrainEnd?.()
 }

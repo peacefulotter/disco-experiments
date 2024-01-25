@@ -57,7 +57,8 @@ export async function train(
     model: tf.LayersModel,
     ds: TokenizedDataset,
     config: Config,
-    getEvalDataset?: () => Promise<TokenizedDatasetWithCallback>
+    getEvalDataset?: () => Promise<TokenizedDatasetWithCallback>,
+    callback?: (model: tf.LayersModel) => Promise<void>
 ): Promise<void> {
     console.log('Starting training on', tf.getBackend(), 'backend')
     const c = getConfig(config)
@@ -171,6 +172,8 @@ export async function train(
                 2
             )} MB`
         )
+
+        callback?.(model)
 
         // Check if we should stop
         iteration++

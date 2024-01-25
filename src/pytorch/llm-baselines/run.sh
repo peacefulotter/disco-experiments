@@ -1,1 +1,1 @@
-python3 ./src/main.py --device=cpu
+python3 ./src/main.py --device=cuda:0
